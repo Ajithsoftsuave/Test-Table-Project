@@ -1,0 +1,14 @@
+<div class="control-section">
+    <ejs-treegrid [dataSource]='data'  childMapping='subtasks' height='645' [treeColumnIndex]='1' id="treegridcomp" allowPaging='true' [pageSettings]='pageSettings' allowExcelExport='true' allowPdfExport='true' allowSorting='true'
+    [contextMenuItems]="contextMenuItems" [editSettings]='editing' [toolbar]="toolbar">
+        <e-columns>
+            <e-column field='taskID' headerText='Task ID' isPrimaryKey='true' width='80' [edit]='editparams' textAlign='Right' editType='numericedit'></e-column>
+            <e-column field='taskName' headerText='Task Name' width='190'></e-column>
+            <e-column field='startDate' headerText='Start Date' width='90' format="yMd" textAlign='Right' editType='datepickeredit'></e-column>
+            <e-column field='endDate' headerText='End Date' width='90' format="yMd" textAlign='Right' editType='datepickeredit'></e-column>
+            <e-column field='duration' headerText='Duration' width='85'  [edit]='editparams' textAlign='Right' editType='numericedit'></e-column>
+            <e-column field='progress' headerText='Progress' width='90' textAlign='Right'  [edit]='editparams' editType='numericedit'></e-column>
+            <e-column field='priority' headerText='Priority' width='80' textAlign='Left'   editType='stringedit'></e-column>
+        </e-columns>
+    </ejs-treegrid>
+</div>
