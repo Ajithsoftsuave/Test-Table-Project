@@ -15,7 +15,7 @@ import { TreeGridModule } from '@syncfusion/ej2-angular-treegrid';
     BrowserModule,
     AppRoutingModule,
     GridAllModule,
-    TreeGridModule
+    TreeGridModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

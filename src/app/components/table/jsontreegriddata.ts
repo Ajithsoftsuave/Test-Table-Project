@@ -1,6 +1,3 @@
-/**
- *Sample data
- */
 export let treeGridDataSource = [
   {
     Name: 'Windows',
@@ -2881,9 +2878,12 @@ export let projectData = [
 
 export let virtualData: any[] = [];
 export function dataSource(): void {
-  let parent: number = -1;
-  let crew: string = 'Crew';
+  let parent = -1;
+  // tslint:disable-next-line: prefer-const
+  let crew = 'Crew';
+  // tslint:disable-next-line: prefer-const
   let parentId: number;
+  // tslint:disable-next-line: prefer-const
   let names: string[] = [
     'VINET',
     'TOMSP',
@@ -2986,12 +2986,12 @@ export function dataSource(): void {
     'RATTC',
     'FAMIA',
   ];
-  for (let i: number = 0; i < 50000; i++) {
+  for (let i = 0; i < 50000; i++) {
     if (i % 5 === 0) {
       parent = i;
     }
     if (i % 5 !== 0) {
-      let num: number = isNaN((virtualData.length % parent) - 1)
+      const num: number = isNaN((virtualData.length % parent) - 1)
         ? 0
         : (virtualData.length % parent) - 1;
       virtualData[num][crew].push({
@@ -3902,6 +3902,7 @@ export let columnData = [
   [3, 5, 6, -4, 0, 1, 2],
   [1, 3, -4, 2, -5, 0, 6],
 ];
+// tslint:disable-next-line: ban-types
 export let getSparkData: Function = (type: string, count: number) => {
   if (type === 'line') {
     return lineData[count];
@@ -3910,6 +3911,7 @@ export let getSparkData: Function = (type: string, count: number) => {
   }
 };
 
+// tslint:disable-next-line: ban-types
 export let countries: Object[] = [
   {
     name: 'USA',
