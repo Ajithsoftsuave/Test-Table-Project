@@ -5,6 +5,9 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { TableComponent } from './components/table/table.component';
 import { TreeGridModule } from '@syncfusion/ej2-angular-treegrid';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ClipboardModule } from 'ngx-clipboard';
+import { DropDownListAllModule } from '@syncfusion/ej2-angular-dropdowns';
 
 @NgModule({
   declarations: [
@@ -16,6 +19,9 @@ import { TreeGridModule } from '@syncfusion/ej2-angular-treegrid';
     AppRoutingModule,
     GridAllModule,
     TreeGridModule,
+    BrowserAnimationsModule,
+    ClipboardModule,
+    DropDownListAllModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
