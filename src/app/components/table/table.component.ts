@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { sampleData } from './jsontreegriddata';
 import {
   SortService,
   ResizeService,
@@ -17,8 +16,9 @@ import { AngularFireDatabaseModule } from '@angular/fire/database';
 import { Task } from './tasks.model';
 import { TaskService } from './task.service';
 import { AngularFireDatabase, AngularFireList } from '@angular/fire/database';
-import { Observable} from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-table',
@@ -58,8 +58,13 @@ export class TableComponent implements OnInit {
   public selectedIndex = -1;
   gridInstance: any;
   public task: Task;
+  public childRow: Task;
 
-  constructor(private clipboardService: ClipboardService, private taskService: TaskService, private db: AngularFireDatabase) {
+  constructor(
+    private clipboardService: ClipboardService,
+    private taskService: TaskService,
+    private db: AngularFireDatabase
+  ) {
     // this.data = sampleData;
     taskService.getTaskList().subscribe((data) => {
       this.data = data;
@@ -73,7 +78,7 @@ export class TableComponent implements OnInit {
     this.contextMenuItems = [
       { text: 'Add Next', target: '.e-content', id: 'addnext' },
       { text: 'Add Child', target: '.e-content', id: 'addchild' },
-      'Delete',
+      { text: 'Delete', target: '.e-content', id: 'delete' },
       'Edit',
       'Copy',
       { text: 'Cut', target: '.e-content', id: 'cut' },
@@ -121,22 +126,63 @@ export class TableComponent implements OnInit {
     this.toolbar = ['Add', 'Update', 'Cancel'];
   }
 
+  // while clicking options in context menu
   contextMenuClick(args?): void {
     if (args.item.id === 'addnext') {
-      //
+      this.addnext(args);
     } else if (args.item.id === 'addchild') {
-      const childRow = {
-        name: 'newRow',
-      };
-      this.treeGridObj.addRecord(childRow, args.index); // call addRecord method with data and index of parent record as parameters
+      this.addchild(args);
+    } else if (args.item.id === 'delete') {
+      this.taskService.deleteTask(args.rowInfo.rowData.taskData.key);
     } else if (args.item.id === 'cut') {
       this.treeGridObj.copy();
       this.treeGridObj.deleteRecord();
     } else if (args.item.id === 'copy') {
-      this.treeGridObj.copy();
+      //
     } else if (args.item.id === 'paste') {
-      // paste
+      //
     }
+  }
+
+  addchild(data: any): void {
+    this.childRow = {
+      id : uuidv4(),
+      taskName: null,
+      resourceCount: null,
+      team: null,
+      progress: null,
+      duration: null,
+      priority: null,
+      approved: null,
+      isSubtask : true
+    };
+    this.taskService.createTask(this.childRow);
+    this.editing = {
+      allowEditing: true,
+      allowAdding: true,
+      allowDeleting: true,
+      mode: 'Row',
+      newRowPosition: 'Child',
+    };
+
+    const index = data.index;
+    this.treeGridObj.selectRow(index); // select the newly added row to scroll to it
+  }
+
+  addnext(data: any): void {
+    this.childRow = {
+      id: uuidv4(),
+      taskName: null,
+      resourceCount: null,
+      team: null,
+      progress: null,
+      duration: null,
+      priority: null,
+      approved: null,
+      isSubtask : false
+    };
+
+    this.taskService.createTask(this.childRow);
   }
 
   // on Hierachy mode changes
@@ -145,9 +191,9 @@ export class TableComponent implements OnInit {
     this.treeGridObj.copyHierarchyMode = mode;
   }
 
-  public addTask(): any{
+  public addTask(): any {
     this.task = {
-      taskID: 2,
+      id: uuidv4(),
       taskName: 'Plan timeline',
       resourceCount: 10,
       team: 'Devops team',
@@ -155,7 +201,7 @@ export class TableComponent implements OnInit {
       progress: 100,
       priority: 'Normal',
       approved: false,
-      isSubtask: false
+      isSubtask: false,
     };
 
     this.taskService.createTask(this.task);

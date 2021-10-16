@@ -7,6 +7,7 @@ import { Observable } from 'rxjs';
     providedIn: 'root'
 })
 export class TaskService {
+
     tasksRef: AngularFireList<Task> = null;
 
     constructor( private db: AngularFireDatabase ){
@@ -25,7 +26,7 @@ export class TaskService {
         return this.tasksRef.update(key, value);
     }
 
-    deleteCustomer(key: string): Promise<void> {
-        return this.tasksRef.remove(key);
+    deleteTask(id: string): Promise<void> {
+        return this.tasksRef.remove(id);
     }
 }

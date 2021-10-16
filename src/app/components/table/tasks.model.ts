@@ -1,5 +1,5 @@
 export class Task{
-    taskID: number;
+    id: string;
     taskName: string;
     resourceCount: number;
     team: string;
