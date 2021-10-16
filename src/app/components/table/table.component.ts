@@ -8,12 +8,16 @@ import {
   ContextMenuService,
   TreeGridComponent,
 } from '@syncfusion/ej2-angular-treegrid';
-import { EditSettingsModel, ToolbarItems  } from '@syncfusion/ej2-treegrid';
+import { EditSettingsModel, ToolbarItems } from '@syncfusion/ej2-treegrid';
 import { MenuEventArgs } from '@syncfusion/ej2-navigations';
 import { ClipboardService } from 'ngx-clipboard';
 import { SelectionSettingsModel } from '@syncfusion/ej2-angular-treegrid';
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { AngularFireDatabaseModule } from '@angular/fire/database';
+import { Task } from './tasks.model';
+import { TaskService } from './task.service';
+import { AngularFireDatabase, AngularFireList } from '@angular/fire/database';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-table',
@@ -29,7 +33,7 @@ import { AngularFireDatabaseModule } from '@angular/fire/database';
 })
 export class TableComponent implements OnInit {
   // tslint:disable-next-line: ban-types
-  public data: Object[] = [];
+  public data: any;
   // tslint:disable-next-line: ban-types
   public pageSettings: Object;
   public editing: EditSettingsModel;
@@ -52,11 +56,15 @@ export class TableComponent implements OnInit {
   public toolbar: ToolbarItems[];
   public selectedIndex = -1;
   gridInstance: any;
+  public task: Task;
 
-  constructor(private clipboardService: ClipboardService) {}
+  constructor(private clipboardService: ClipboardService, private taskService: TaskService, private db: AngularFireDatabase) {
+    // this.data = sampleData;
+    this.data = taskService.getTaskList();
+    console.log('tasks', this.data);
+  }
 
   ngOnInit(): void {
-    this.data = sampleData;
 
     // items should be in context menu. type string are default, type object are custom options
     this.contextMenuItems = [
@@ -67,9 +75,21 @@ export class TableComponent implements OnInit {
       'Copy',
       { text: 'Cut', target: '.e-content', id: 'cut' },
       { text: 'Paste', target: '.e-content', id: 'paste' },
-      { text: 'Style', target: '.e-gridheader', id: 'paste', items : [{ text: 'Data-Type', id: 'datatype' }, { text: 'Default-Value', id: 'defaultvalue' },
-       { text: 'Minimum-Column-Width', id: 'minwidth' }, { text: 'Font-size', id: 'fontsize' }, { text: 'Font-color', id: 'fontcolor' },
-       { text: 'Background-color', id: 'bgcolr' }, { text: 'Alignment', id: 'alignment' } , { text: 'Text-wrap', id: 'textwrap' }] },
+      {
+        text: 'Style',
+        target: '.e-gridheader',
+        id: 'paste',
+        items: [
+          { text: 'Data-Type', id: 'datatype' },
+          { text: 'Default-Value', id: 'defaultvalue' },
+          { text: 'Minimum-Column-Width', id: 'minwidth' },
+          { text: 'Font-size', id: 'fontsize' },
+          { text: 'Font-color', id: 'fontcolor' },
+          { text: 'Background-color', id: 'bgcolr' },
+          { text: 'Alignment', id: 'alignment' },
+          { text: 'Text-wrap', id: 'textwrap' },
+        ],
+      },
       { text: 'New', target: '.e-gridheader', id: 'new' },
       { text: 'Delete', target: '.e-gridheader', id: 'delete' },
       { text: 'Edit', target: '.e-gridheader', id: 'edit' },
@@ -81,11 +101,10 @@ export class TableComponent implements OnInit {
       'FirstPage',
       'PrevPage',
       'LastPage',
-      'NextPage'
+      'NextPage',
     ];
 
     this.editing = { allowDeleting: true, allowEditing: true, mode: 'Row' };
-    this.pageSettings = { pageSize: 20 };
     this.editparams = { params: { format: 'n' } };
 
     this.dropData = [
@@ -103,10 +122,10 @@ export class TableComponent implements OnInit {
     if (args.item.id === 'addnext') {
       //
     } else if (args.item.id === 'addchild') {
-        const childRow = {
-          name: 'newRow'
-        };
-        this.treeGridObj.addRecord(childRow, args.index); // call addRecord method with data and index of parent record as parameters
+      const childRow = {
+        name: 'newRow',
+      };
+      this.treeGridObj.addRecord(childRow, args.index); // call addRecord method with data and index of parent record as parameters
     } else if (args.item.id === 'cut') {
       this.treeGridObj.copy();
       this.treeGridObj.deleteRecord();
@@ -117,10 +136,25 @@ export class TableComponent implements OnInit {
     }
   }
 
-
   // on Hierachy mode changes
   onChange(e: ChangeEventArgs): any {
     const mode: any = e.value as string;
     this.treeGridObj.copyHierarchyMode = mode;
-}
+  }
+
+  public addTask(): any{
+    this.task = {
+      taskID: 2,
+      taskName: 'Plan timeline',
+      startDate: new Date('02/03/2017'),
+      endDate: new Date('02/07/2017'),
+      duration: 5,
+      progress: 100,
+      priority: 'Normal',
+      approved: false,
+      isSubtask: false
+    };
+
+    this.taskService.createTask(this.task);
+  }
 }

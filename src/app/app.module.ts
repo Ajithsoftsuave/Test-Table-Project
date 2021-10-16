@@ -10,6 +10,7 @@ import { ClipboardModule } from 'ngx-clipboard';
 import { DropDownListAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireDatabaseModule } from '@angular/fire/database';
+import { AngularFireStorageModule } from '@angular/fire/storage';
 import { environment } from 'src/environments/environment';
 
 @NgModule({
@@ -26,7 +27,8 @@ import { environment } from 'src/environments/environment';
     ClipboardModule,
     DropDownListAllModule,
     AngularFireModule.initializeApp(environment.firebase),
-    AngularFireDatabaseModule
+    AngularFireDatabaseModule,
+    AngularFireStorageModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
