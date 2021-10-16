@@ -1,6 +1,7 @@
+<h2 class="title"> Project Tasks List</h2>
 <div style="padding-top: 7px; float:left">Hierarchy Mode</div><div style="padding-left: 10px; display: inline-block"><ejs-dropdownlist (change)='onChange($event)' [dataSource]='dropData' value='Parent' [fields]='fields'></ejs-dropdownlist></div>
 <div class="control-section">
-    <ejs-treegrid #treegrid [dataSource]='data' [enableHover]='false' childMapping='subtasks' height='630' [treeColumnIndex]='1' id="treegridcomp" allowPaging='true' [pageSettings]='pageSettings' allowExcelExport='true' allowPdfExport='true' allowSorting='true' [allowSelection]='true' [selectionSettings]='selectionOptions'
+    <ejs-treegrid #treegrid [dataSource]='data' [enableHover]='false' childMapping='subtasks' height='500' [treeColumnIndex]='1' id="treegridcomp" allowPaging='true' [pageSettings]='pageSettings' allowExcelExport='true' allowPdfExport='true' allowSorting='true' [allowSelection]='true' [selectionSettings]='selectionOptions'
     [contextMenuItems]="contextMenuItems" [editSettings]='editing' [toolbar]="toolbar" (contextMenuClick)='contextMenuClick($event)'>
         <e-columns>
             <e-column type='checkbox' width='50'></e-column>

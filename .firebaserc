@@ -1,0 +1,11 @@
+{
+  "targets": {
+    "syncfusion-d00f4": {
+      "hosting": {
+        "test-app": [
+          "syncfusion-d00f4"
+        ]
+      }
+    }
+  }
+}

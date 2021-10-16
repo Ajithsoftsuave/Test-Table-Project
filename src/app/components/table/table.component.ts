@@ -13,6 +13,7 @@ import { MenuEventArgs } from '@syncfusion/ej2-navigations';
 import { ClipboardService } from 'ngx-clipboard';
 import { SelectionSettingsModel } from '@syncfusion/ej2-angular-treegrid';
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
+import { AngularFireDatabaseModule } from '@angular/fire/database';
 
 @Component({
   selector: 'app-table',
@@ -102,7 +103,7 @@ export class TableComponent implements OnInit {
     if (args.item.id === 'addnext') {
       //
     } else if (args.item.id === 'addchild') {
-        var childRow = {
+        const childRow = {
           name: 'newRow'
         };
         this.treeGridObj.addRecord(childRow, args.index); // call addRecord method with data and index of parent record as parameters

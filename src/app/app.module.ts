@@ -8,6 +8,9 @@ import { TreeGridModule } from '@syncfusion/ej2-angular-treegrid';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ClipboardModule } from 'ngx-clipboard';
 import { DropDownListAllModule } from '@syncfusion/ej2-angular-dropdowns';
+import { AngularFireModule } from '@angular/fire';
+import { AngularFireDatabaseModule } from '@angular/fire/database';
+import { environment } from 'src/environments/environment';
 
 @NgModule({
   declarations: [
@@ -22,6 +25,8 @@ import { DropDownListAllModule } from '@syncfusion/ej2-angular-dropdowns';
     BrowserAnimationsModule,
     ClipboardModule,
     DropDownListAllModule,
+    AngularFireModule.initializeApp(environment.firebase),
+    AngularFireDatabaseModule
   ],
   providers: [],
   bootstrap: [AppComponent]
