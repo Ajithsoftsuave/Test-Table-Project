@@ -17,7 +17,8 @@ import { AngularFireDatabaseModule } from '@angular/fire/database';
 import { Task } from './tasks.model';
 import { TaskService } from './task.service';
 import { AngularFireDatabase, AngularFireList } from '@angular/fire/database';
-import { Observable } from 'rxjs';
+import { Observable} from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-table',
@@ -33,7 +34,7 @@ import { Observable } from 'rxjs';
 })
 export class TableComponent implements OnInit {
   // tslint:disable-next-line: ban-types
-  public data: any;
+  public data: any = this.taskService.getTaskList();
   // tslint:disable-next-line: ban-types
   public pageSettings: Object;
   public editing: EditSettingsModel;
@@ -60,8 +61,6 @@ export class TableComponent implements OnInit {
 
   constructor(private clipboardService: ClipboardService, private taskService: TaskService, private db: AngularFireDatabase) {
     // this.data = sampleData;
-    this.data = taskService.getTaskList();
-    console.log('tasks', this.data);
   }
 
   ngOnInit(): void {

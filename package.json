@@ -27,13 +27,13 @@
     "@syncfusion/ej2-angular-grids": "^19.3.44",
     "@syncfusion/ej2-angular-treegrid": "^19.3.44",
     "@syncfusion/ej2-treegrid": "^19.3.44",
+    "firebase": "^8.6.1",
     "ngtreegrid": "^3.3.82",
     "ngx-clipboard": "^14.0.1",
     "rxjs": "~6.6.0",
     "treegrid": "^1.0.8",
     "tslib": "^2.0.0",
-    "zone.js": "~0.10.2",
-    "firebase": "^7.0 || ^8.0"
+    "zone.js": "~0.10.2"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.1002.0",
