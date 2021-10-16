@@ -34,7 +34,7 @@ import { map } from 'rxjs/operators';
 })
 export class TableComponent implements OnInit {
   // tslint:disable-next-line: ban-types
-  public data: any = this.taskService.getTaskList();
+  public data: any;
   // tslint:disable-next-line: ban-types
   public pageSettings: Object;
   public editing: EditSettingsModel;
@@ -61,6 +61,10 @@ export class TableComponent implements OnInit {
 
   constructor(private clipboardService: ClipboardService, private taskService: TaskService, private db: AngularFireDatabase) {
     // this.data = sampleData;
+    taskService.getTaskList().subscribe((data) => {
+      this.data = data;
+      console.log('tasks', data);
+    });
   }
 
   ngOnInit(): void {
@@ -145,8 +149,8 @@ export class TableComponent implements OnInit {
     this.task = {
       taskID: 2,
       taskName: 'Plan timeline',
-      startDate: new Date('02/03/2017'),
-      endDate: new Date('02/07/2017'),
+      resourceCount: 10,
+      team: 'Devops team',
       duration: 5,
       progress: 100,
       priority: 'Normal',

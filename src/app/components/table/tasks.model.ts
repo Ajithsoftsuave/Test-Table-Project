@@ -1,8 +1,8 @@
 export class Task{
     taskID: number;
     taskName: string;
-    startDate: object;
-    endDate: object;
+    resourceCount: number;
+    team: string;
     progress: number;
     duration: number;
     priority: string;

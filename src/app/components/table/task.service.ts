@@ -1,23 +1,20 @@
 import { Injectable } from '@angular/core';
 import { AngularFireDatabase, AngularFireList } from '@angular/fire/database';
 import { Task } from './tasks.model';
-import { AngularFirestore } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 
 @Injectable({
     providedIn: 'root'
 })
 export class TaskService {
-    private dbPath = '/tasks';
     tasksRef: AngularFireList<Task> = null;
-    tasks: Observable<any>;
 
-    constructor( private db: AngularFireDatabase, private firestore: AngularFirestore ){
-        this.tasksRef = db.list(this.dbPath);
+    constructor( private db: AngularFireDatabase ){
+        this.tasksRef = db.list('/tasks');
     }
 
     getTaskList(): any{
-        return this.firestore.collection('tasks').valueChanges();
+        return this.db.list('tasks').valueChanges();
     }
 
     createTask(task: Task): void {
