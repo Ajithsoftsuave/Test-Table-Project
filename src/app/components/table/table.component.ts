@@ -34,7 +34,8 @@ import { v4 as uuidv4 } from 'uuid';
 })
 export class TableComponent implements OnInit {
   // tslint:disable-next-line: ban-types
-  public data: any;
+  public responseData: Task[];
+  public tableData: Task[] = [];
   // tslint:disable-next-line: ban-types
   public pageSettings: Object;
   public editing: EditSettingsModel;
@@ -67,8 +68,16 @@ export class TableComponent implements OnInit {
   ) {
     // this.data = sampleData;
     taskService.getTaskList().subscribe((data) => {
-      this.data = data;
-      console.log('tasks', data);
+      this.responseData = data;
+      for (const singleRecord of data){
+        if (!singleRecord.isSubtask){
+        if (singleRecord.subtasks){
+          this.tableData.push(this.appendSubTasks(singleRecord));
+        }else{
+          this.tableData.push(singleRecord);
+        }
+      }}
+      console.log(this.tableData);
     });
   }
 
@@ -126,6 +135,29 @@ export class TableComponent implements OnInit {
     this.toolbar = ['Add', 'Edit', 'Update', 'Cancel'];
   }
 
+  // append subtasks
+  public appendSubTasks(parentTask: Task): Task{
+    // tslint:disable-next-line: prefer-for-of
+    for (let i = 0; i < parentTask.subtasks.length; i++){
+      if (this.getItemById(parentTask.subtasks[i])?.subtasks){
+        parentTask.subtasks[i] = this.appendSubTasks(parentTask.subtasks[i]);
+      } else{
+        parentTask.subtasks[i] = this.getItemById(parentTask.subtasks[i]);
+      }
+    }
+
+    return parentTask;
+  }
+
+  // fetching record by Id
+  public getItemById(id: string): Task{
+    for (const task of this.responseData){
+      if ( id === task.id ){
+        return task;
+      }
+    }
+  }
+
   // while clicking options in context menu
   contextMenuClick(args?): void {
     if (args.item.id === 'addnext') {
@@ -141,7 +173,7 @@ export class TableComponent implements OnInit {
       //
     } else if (args.item.id === 'paste') {
       //
-    } else if(args.item.text === 'Edit Record'){
+    } else if (args.item.text === 'Edit Record'){
       this.editRecord(args);
     }
   }
@@ -156,7 +188,8 @@ export class TableComponent implements OnInit {
       duration: null,
       priority: null,
       approved: null,
-      isSubtask : true
+      isSubtask : true,
+      subtasks : null
     };
     this.taskService.createTask(this.childRow);
     this.editing = {
@@ -170,7 +203,7 @@ export class TableComponent implements OnInit {
     const index = data.index;
     this.treeGridObj.selectRow(index); // select the newly added row to scroll to it
   }
-  editRecord(data: any) {
+  editRecord(data: any): void{
     this.editing = {
       allowEditing: true,
       allowAdding: true,
@@ -179,7 +212,7 @@ export class TableComponent implements OnInit {
       newRowPosition: 'Child',
     };
     const index = data.index;
-    console.log(index)
+    console.log(index);
   }
 
   addnext(data: any): void {
@@ -192,7 +225,8 @@ export class TableComponent implements OnInit {
       duration: null,
       priority: null,
       approved: null,
-      isSubtask : false
+      isSubtask : false,
+      subtasks : null
     };
 
     this.taskService.createTask(this.childRow);
@@ -206,15 +240,16 @@ export class TableComponent implements OnInit {
 
   public addTask(): any {
     this.task = {
-      id: uuidv4(),
-      taskName: 'Plan timeline',
+      id: '40858fa0-fafe-4871-ad8c-6ff9fa9947fe',
+      taskName: 'Sub task 2',
       resourceCount: 10,
-      team: 'Devops team',
+      team: 'Test team',
       duration: 5,
       progress: 100,
       priority: 'Normal',
       approved: false,
-      isSubtask: false,
+      isSubtask: true,
+      subtasks: null
     };
 
     this.taskService.createTask(this.task);

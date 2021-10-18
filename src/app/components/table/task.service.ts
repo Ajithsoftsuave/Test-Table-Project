@@ -19,7 +19,7 @@ export class TaskService {
             map((products: any[]) => products.map(prod => {
               const payload = prod.payload.val();
               const key = prod.key;
-              return <any>{ key, ...payload };
+              return { key, ...payload } as any;
             })),
           );
         // return this.db.list('tasks').valueChanges();

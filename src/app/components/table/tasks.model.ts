@@ -7,6 +7,6 @@ export class Task{
     duration: number;
     priority: string;
     approved: boolean;
-    subtasks ?: Task[];
+    subtasks: any[];
     isSubtask: boolean;
 }
