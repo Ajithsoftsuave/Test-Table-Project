@@ -1,21 +1,28 @@
 import { Injectable } from '@angular/core';
 import { AngularFireDatabase, AngularFireList } from '@angular/fire/database';
 import { Task } from './tasks.model';
-import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable({
     providedIn: 'root'
 })
 export class TaskService {
 
-    tasksRef: AngularFireList<Task> = null;
+    tasksRef: AngularFireList<any> = null;
 
     constructor( private db: AngularFireDatabase ){
         this.tasksRef = db.list('/tasks');
     }
 
     getTaskList(): any{
-        return this.db.list('tasks').valueChanges();
+        return this.db.list('/tasks').snapshotChanges().pipe(
+            map((products: any[]) => products.map(prod => {
+              const payload = prod.payload.val();
+              const key = prod.key;
+              return <any>{ key, ...payload };
+            })),
+          );
+        // return this.db.list('tasks').valueChanges();
     }
 
     createTask(task: Task): void {

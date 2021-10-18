@@ -112,7 +112,7 @@ export class TableComponent implements OnInit {
       'NextPage',
     ];
 
-    this.editing = { allowDeleting: true, allowEditing: true, mode: 'Row' };
+    this.editing = { allowDeleting: true, allowEditing: true, allowAdding: true, mode: 'Row' };
     this.editparams = { params: { format: 'n' } };
 
     this.dropData = [
@@ -123,7 +123,7 @@ export class TableComponent implements OnInit {
     ];
     this.fields = { text: 'mode', value: 'id' };
     this.selectionOptions = { type: 'Multiple' };
-    this.toolbar = ['Add', 'Update', 'Cancel'];
+    this.toolbar = ['Add', 'Edit', 'Update', 'Cancel'];
   }
 
   // while clicking options in context menu
@@ -141,6 +141,8 @@ export class TableComponent implements OnInit {
       //
     } else if (args.item.id === 'paste') {
       //
+    } else if(args.item.text === 'Edit Record'){
+      this.editRecord(args);
     }
   }
 
@@ -167,6 +169,17 @@ export class TableComponent implements OnInit {
 
     const index = data.index;
     this.treeGridObj.selectRow(index); // select the newly added row to scroll to it
+  }
+  editRecord(data: any) {
+    this.editing = {
+      allowEditing: true,
+      allowAdding: true,
+      allowDeleting: true,
+      mode: 'Row',
+      newRowPosition: 'Child',
+    };
+    const index = data.index;
+    console.log(index)
   }
 
   addnext(data: any): void {
