@@ -19,6 +19,7 @@ import { AngularFireDatabase, AngularFireList } from '@angular/fire/database';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { v4 as uuidv4 } from 'uuid';
+import { element } from 'protractor';
 
 @Component({
   selector: 'app-table',
@@ -142,7 +143,12 @@ export class TableComponent implements OnInit {
       if (this.getItemById(parentTask.subtasks[i])?.subtasks){
         parentTask.subtasks[i] = this.appendSubTasks(parentTask.subtasks[i]);
       } else{
+        const fetchedRecord = this.getItemById(parentTask.subtasks[i]);
+        if (fetchedRecord){
         parentTask.subtasks[i] = this.getItemById(parentTask.subtasks[i]);
+        } else{
+          delete parentTask.subtasks[i];
+        }
       }
     }
 
@@ -156,6 +162,17 @@ export class TableComponent implements OnInit {
         return task;
       }
     }
+    return null;
+  }
+
+  getIndexById(id: string): number{
+    // tslint:disable-next-line: prefer-for-of
+    for (let index = 0; index < this.responseData.length; index++){
+      if ( id === this.responseData[index].id ){
+        return index;
+      }
+    }
+    return null;
   }
 
   // while clicking options in context menu
@@ -178,19 +195,21 @@ export class TableComponent implements OnInit {
     }
   }
 
-  addchild(data: any): void {
+  addchild(args: any): void {
+    const newRecordId = uuidv4();
     this.childRow = {
-      id : uuidv4(),
+      id : newRecordId,
       taskName: null,
-      resourceCount: null,
+      resourceCount: 0,
       team: null,
       progress: null,
       duration: null,
       priority: null,
-      approved: null,
+      approved: false,
       isSubtask : true,
       subtasks : null
     };
+    /*
     this.taskService.createTask(this.childRow);
     this.editing = {
       allowEditing: true,
@@ -201,7 +220,17 @@ export class TableComponent implements OnInit {
     };
 
     const index = data.index;
-    this.treeGridObj.selectRow(index); // select the newly added row to scroll to it
+    this.treeGridObj.selectRow(index); // select the newly added row to scroll to it */
+    this.taskService.createTask(this.childRow);
+    const recordToUpdate: Task = this.getItemById(args.rowInfo.rowData.taskData.id);
+    console.log(recordToUpdate.subtasks);
+    if (recordToUpdate.subtasks){
+      recordToUpdate.subtasks.push(newRecordId);
+    } else {
+      recordToUpdate.subtasks = [newRecordId];
+    }
+    this.taskService.updateTask(args.rowInfo.rowData.taskData.key , recordToUpdate);
+
   }
   editRecord(data: any): void{
     this.editing = {
@@ -212,7 +241,6 @@ export class TableComponent implements OnInit {
       newRowPosition: 'Child',
     };
     const index = data.index;
-    console.log(index);
   }
 
   addnext(data: any): void {
@@ -220,7 +248,7 @@ export class TableComponent implements OnInit {
       id: uuidv4(),
       taskName: null,
       resourceCount: null,
-      team: null,
+      team: 'null',
       progress: null,
       duration: null,
       priority: null,
@@ -228,8 +256,9 @@ export class TableComponent implements OnInit {
       isSubtask : false,
       subtasks : null
     };
-
-    this.taskService.createTask(this.childRow);
+    this.responseData.splice(this.getIndexById(data.rowInfo.rowData.taskData.id) + 1, 0, this.childRow);
+    console.log(this.responseData);
+    // this.taskService.createTask(this.childRow);
   }
 
   // on Hierachy mode changes
@@ -240,15 +269,15 @@ export class TableComponent implements OnInit {
 
   public addTask(): any {
     this.task = {
-      id: '40858fa0-fafe-4871-ad8c-6ff9fa9947fe',
-      taskName: 'Sub task 2',
+      id: '70858fa0-fafe-4871-ad8c-6ff9fa9947ff',
+      taskName: 'Paren task 3',
       resourceCount: 10,
       team: 'Test team',
       duration: 5,
       progress: 100,
       priority: 'Normal',
       approved: false,
-      isSubtask: true,
+      isSubtask: false,
       subtasks: null
     };
 
