@@ -72,7 +72,6 @@ export class TableComponent implements OnInit {
     // this.data = sampleData;
     taskService.getTaskList().subscribe((data) => {
       this.responseData = data;
-      console.log('incoming data', data);
       for (const singleRecord of data) {
         if (!singleRecord.isSubtask) {
           if (singleRecord.subtasks) {
@@ -115,8 +114,8 @@ export class TableComponent implements OnInit {
       { text: 'Delete', target: '.e-gridheader', id: 'delete' },
       { text: 'Edit', target: '.e-gridheader', id: 'edit' },
       { text: 'Freeze', target: '.e-gridheader', id: 'freeze' },
-      { text: 'Filter', target: '.e-gridheader', id: 'filter' },
-      { text: 'Multisort', target: '.e-gridheader', id: 'multiSort' },
+      { text: 'Filter', target: '.e-gridheader', id: 'paste' },
+      { text: 'Multisort', target: '.e-gridheader', id: 'paste' },
       'Save',
       'Cancel',
       'FirstPage',
@@ -150,7 +149,6 @@ export class TableComponent implements OnInit {
   // append subtasks
   public appendSubTasks(parentTask: Task): Task {
     // tslint:disable-next-line: prefer-for-of
-    console.log('current parent task', parentTask);
     for (let i = 0; i < parentTask.subtasks.length; i++) {
       if (this.getItemById(parentTask.subtasks[i])?.subtasks) {
         parentTask.subtasks[i] = this.appendSubTasks(
@@ -188,49 +186,18 @@ export class TableComponent implements OnInit {
     return null;
   }
 
-  ngAfterViewInit() {
+  ngAfterViewInit(): void{
     this.treegridColumns = [
-      {
-        field: 'id',
-        headerText: 'ID',
-        isPrimaryKey: 'true',
-        width: '140',
-        textAlign: 'Right',
-        editType: 'numericedit',
-      },
-      { field: 'taskName', headerText: 'Task Name', width: '110' },
-      { field: 'resourceCount', headerText: 'Resource Count', width: '90' },
-      { field: 'team', headerText: 'Team', width: '70' },
-      {
-        field: 'duration',
-        headerText: 'Duration',
-        width: '85',
-        textAlign: 'Right',
-        editType: 'numericedit',
-      },
-      {
-        field: 'progress',
-        headerText: 'Progress',
-        width: '90',
-        textAlign: 'Right',
-        editType: 'numericedit',
-      },
-      {
-        field: 'priority',
-        headerText: 'Priority',
-        width: '80',
-        textAlign: 'Right',
-        editType: 'stringedit',
-      },
-      {
-        field: 'approved',
-        headerText: 'Approved',
-        width: '80',
-        textAlign: 'Right',
-        editType: 'stringedit',
-      },
-    ];
-  }
+   {field:'id', headerText:'ID', isPrimaryKey:'true', width:'140', textAlign:'Right' ,editType:'numericedit'},
+   { field:'taskName' ,headerText:'Task Name', width:'110'},
+   {field:'resourceCount', headerText:'Resource Count', width:'90'},
+   {field:'team', headerText:'Team', width:'70'},
+  { field:'duration' ,headerText:'Duration', width:'85', textAlign:'Right', editType:'numericedit'},
+  { field:'progress', headerText:'Progress', width:'90', textAlign:'Right'  , editType:'numericedit'},
+   { field:'priority' ,headerText:'Priority' ,width:'80' ,textAlign:'Right'   ,editType:'stringedit'},
+   { field:'approved', headerText:'Approved', width:'80', textAlign:'Right'  , editType:'stringedit'}];
+
+}
   // while clicking options in context menu
   contextMenuClick(args?): void {
     if (args.item.id === 'addnext') {
@@ -248,10 +215,21 @@ export class TableComponent implements OnInit {
       //
     } else if (args.item.text === 'Edit Record') {
       this.editRecord(args);
-    }
-    if (args.item.id === 'insert') {
-      const columnName = { field: 'data', width: 100 };
-      // this.treegrid.columns.push(columnName); // Insert Columns
+    }else if (args.item.id === 'freeze') {
+      /*const treegridtreegridcomp = window.localStorage.getItem('treegridtreegridcomp');
+      const treegridtreegridcompJSON = JSON.parse(treegridtreegridcomp);
+
+      if (treegridtreegridcomp) {
+       treegridtreegridcompJSON.columns.map((column, index) => {
+          if (column  && column.field && args && args.column && column.field === args.column.field ) {
+            this.treeGridObj.frozenColumns = index + 1;
+          }
+        });
+      }*/
+
+    }else if (args.item.id === 'insert') {
+      let columnName = { field: 'data', width: 100 };
+    // this.treegrid.columns.push(columnName); // Insert Columns
       this.treegrid.refreshColumns(); // Refresh Columns
     } else if (args.item.id === 'deleteColumn') {
       const columnName = 2;
@@ -282,7 +260,6 @@ export class TableComponent implements OnInit {
       0,
       this.childRow
     );
-    console.log(this.responseData);
     this.taskService.createTask(this.childRow);
   }
 
@@ -304,7 +281,6 @@ export class TableComponent implements OnInit {
     const recordToUpdate: Task = this.getItemById(
       args.rowInfo.rowData.taskData.id
     );
-    console.log(recordToUpdate.subtasks);
     if (recordToUpdate.subtasks) {
       for (let index = 0; index < recordToUpdate.subtasks.length; index++) {
         recordToUpdate.subtasks[index] = recordToUpdate.subtasks[index].id;

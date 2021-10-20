@@ -4,14 +4,18 @@ import { GridAllModule } from '@syncfusion/ej2-angular-grids';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { TableComponent } from './components/table/table.component';
-import { TreeGridModule } from '@syncfusion/ej2-angular-treegrid';
+import {FreezeService, TreeGridModule} from '@syncfusion/ej2-angular-treegrid';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ClipboardModule } from 'ngx-clipboard';
 import { DropDownListAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireDatabaseModule } from '@angular/fire/database';
 import { AngularFireStorageModule } from '@angular/fire/storage';
+import { ReorderService} from '@syncfusion/ej2-angular-treegrid';
+import { ResizeService } from '@syncfusion/ej2-angular-treegrid';
 import { environment } from 'src/environments/environment';
+import {SortService } from '@syncfusion/ej2-angular-treegrid';
+import {FilterService} from '@syncfusion/ej2-angular-treegrid';
 
 @NgModule({
   declarations: [
@@ -30,7 +34,13 @@ import { environment } from 'src/environments/environment';
     AngularFireDatabaseModule,
     AngularFireStorageModule,
   ],
-  providers: [],
+  providers: [
+    ReorderService,
+    ResizeService,
+    FreezeService,
+    SortService,
+    FilterService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
