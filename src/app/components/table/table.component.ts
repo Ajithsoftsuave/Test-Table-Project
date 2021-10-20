@@ -62,7 +62,7 @@ export class TableComponent implements OnInit {
   public task: Task;
   public childRow: Task;
   public contextMenuValue: Object;
-  treegridColumns : Array<any> = new Array;
+  treegridColumns: Array<any> = new Array;
   constructor(
     private clipboardService: ClipboardService,
     private taskService: TaskService,
@@ -181,9 +181,10 @@ export class TableComponent implements OnInit {
     return null;
   }
 
-  ngAfterViewInit(){  
-    this.treegridColumns = [ 
-   {field:'id', headerText:'ID', isPrimaryKey:'true', width:'140', textAlign:'Right' ,editType:'numericedit'},
+  // tslint:disable-next-line: use-lifecycle-interface
+  ngAfterViewInit(){
+    this.treegridColumns = [
+   {field: 'id', headerText: 'ID', isPrimaryKey: 'true', width: '140', textAlign: 'Right' ,editType:'numericedit'},
    { field:'taskName' ,headerText:'Task Name', width:'110'},
    {field:'resourceCount', headerText:'Resource Count', width:'90'},
    {field:'team', headerText:'Team', width:'70'},
@@ -216,13 +217,13 @@ export class TableComponent implements OnInit {
     // this.treegrid.columns.push(columnName); // Insert Columns
       this.treegrid.refreshColumns(); // Refresh Columns
     } else if (args.item.id === 'deleteColumn') {
-      let columnName = 2;
-      this.treegrid.columns.splice(columnName, 1); //Splice columns
-      this.treegrid.refreshColumns(); //Refresh Columns
+      const columnName = 2;
+      this.treegrid.columns.splice(columnName, 1); // Splice columns
+      this.treegrid.refreshColumns(); // Refresh Columns
     } else if (args.item.id === 'rename') {
-      let data = args.column.field
-      this.treegrid.getColumnByField(data).headerText = 'Task details'; //Rename column name
-      this.treegrid.refreshColumns(); //Refresh Columns
+      const data = args.column.field;
+      this.treegrid.getColumnByField(data).headerText = 'Task details'; // Rename column name
+      this.treegrid.refreshColumns(); // Refresh Columns
     }
   }
 
