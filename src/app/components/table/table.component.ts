@@ -61,7 +61,8 @@ export class TableComponent implements OnInit {
   gridInstance: any;
   public task: Task;
   public childRow: Task;
-
+  public contextMenuValue: Object;
+  treegridColumns : Array<any> = new Array;
   constructor(
     private clipboardService: ClipboardService,
     private taskService: TaskService,
@@ -120,6 +121,9 @@ export class TableComponent implements OnInit {
       'PrevPage',
       'LastPage',
       'NextPage',
+      { text: 'Insert Column', target: '.e-headercontent', id: 'insert' },
+      { text: 'Delete Column', target: '.e-headercontent', id: 'deleteColumn' },
+      { text: 'Rename Column', target: '.e-headercontent', id: 'rename' }
     ];
 
     this.editing = { allowDeleting: true, allowEditing: true, allowAdding: true, mode: 'Row' };
@@ -175,13 +179,25 @@ export class TableComponent implements OnInit {
     return null;
   }
 
+  ngAfterViewInit(){  
+    this.treegridColumns = [ 
+   {field:'id', headerText:'ID', isPrimaryKey:'true', width:'140', textAlign:'Right' ,editType:'numericedit'},
+   { field:'taskName' ,headerText:'Task Name', width:'110'},
+   {field:'resourceCount', headerText:'Resource Count', width:'90'},
+   {field:'team', headerText:'Team', width:'70'},
+  { field:'duration' ,headerText:'Duration', width:'85', textAlign:'Right', editType:'numericedit'},
+  { field:'progress', headerText:'Progress', width:'90', textAlign:'Right'  , editType:'numericedit'},
+   { field:'priority' ,headerText:'Priority' ,width:'80' ,textAlign:'Right'   ,editType:'stringedit'},
+   { field:'approved', headerText:'Approved', width:'80', textAlign:'Right'  , editType:'stringedit'}]; 
+    
+} 
   // while clicking options in context menu
   contextMenuClick(args?): void {
     if (args.item.id === 'addnext') {
       this.addnext(args);
     } else if (args.item.id === 'addchild') {
       this.addchild(args);
-    } else if (args.item.id === 'delete') {
+    } else if (args.item.id === 'delete' && args.item.target === ".e-content") {
       this.taskService.deleteTask(args.rowInfo.rowData.taskData.key);
     } else if (args.item.id === 'cut') {
       this.treeGridObj.copy();
@@ -192,6 +208,19 @@ export class TableComponent implements OnInit {
       //
     } else if (args.item.text === 'Edit Record'){
       this.editRecord(args);
+    }
+    if (args.item.id === 'insert') {
+      let columnName = { field: 'data', width: 100 };
+    // this.treegrid.columns.push(columnName); // Insert Columns
+      this.treegrid.refreshColumns(); // Refresh Columns
+    } else if (args.item.id === 'deleteColumn') {
+      let columnName = 2;
+      this.treegrid.columns.splice(columnName, 1); //Splice columns
+      this.treegrid.refreshColumns(); //Refresh Columns
+    } else if (args.item.id === 'rename') {
+      let data = args.column.field
+      this.treegrid.getColumnByField(data).headerText = 'Task details'; //Rename column name
+      this.treegrid.refreshColumns(); //Refresh Columns
     }
   }
 
