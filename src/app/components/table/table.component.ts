@@ -49,7 +49,7 @@ export class TableComponent implements OnInit {
 
   @ViewChild(TreeGridComponent, { static: false }) treegrid: TreeGridComponent;
 
-  public copiedRow: any;
+  public copiedTasks: any;
 
   // tslint:disable-next-line: ban-types
   public dropData: Object[];
@@ -72,16 +72,7 @@ export class TableComponent implements OnInit {
     // this.data = sampleData;
     taskService.getTaskList().subscribe((data) => {
       this.responseData = data;
-      for (const singleRecord of data) {
-        if (!singleRecord.isSubtask) {
-          if (singleRecord.subtasks) {
-            this.tableData.push(this.appendSubTasks(singleRecord));
-          } else {
-            this.tableData.push(singleRecord);
-          }
-        }
-      }
-      console.log(this.tableData);
+      this.makeTreeGrid();
     });
   }
 
@@ -92,7 +83,7 @@ export class TableComponent implements OnInit {
       { text: 'Add Child', target: '.e-content', id: 'addchild' },
       { text: 'Delete', target: '.e-content', id: 'delete' },
       'Edit',
-      'Copy',
+      { text: 'Copy', target: '.e-content', id: 'copy' },
       { text: 'Cut', target: '.e-content', id: 'cut' },
       { text: 'Paste', target: '.e-content', id: 'paste' },
       {
@@ -146,6 +137,21 @@ export class TableComponent implements OnInit {
     this.toolbar = ['Add', 'Edit', 'Update', 'Cancel'];
   }
 
+  // Stucture the DB data to treegrid
+  // tslint:disable-next-line: typedef
+  public makeTreeGrid() {
+    this.tableData = [];
+    for (const singleRecord of this.responseData) {
+      if (!singleRecord.isSubtask) {
+        if (singleRecord.subtasks) {
+          this.tableData.push(this.appendSubTasks(singleRecord));
+        } else {
+          this.tableData.push(singleRecord);
+        }
+      }
+    }
+  }
+
   // append subtasks
   public appendSubTasks(parentTask: Task): Task {
     // tslint:disable-next-line: prefer-for-of
@@ -159,7 +165,7 @@ export class TableComponent implements OnInit {
         if (fetchedRecord) {
           parentTask.subtasks[i] = this.getItemById(parentTask.subtasks[i]);
         } else {
-          delete parentTask.subtasks[i];
+          parentTask.subtasks.splice(i, 1);
         }
       }
     }
@@ -186,18 +192,49 @@ export class TableComponent implements OnInit {
     return null;
   }
 
-  ngAfterViewInit(): void{
+  ngAfterViewInit(): void {
     this.treegridColumns = [
-   {field:'id', headerText:'ID', isPrimaryKey:'true', width:'140', textAlign:'Right' ,editType:'numericedit'},
-   { field:'taskName' ,headerText:'Task Name', width:'110'},
-   {field:'resourceCount', headerText:'Resource Count', width:'90'},
-   {field:'team', headerText:'Team', width:'70'},
-  { field:'duration' ,headerText:'Duration', width:'85', textAlign:'Right', editType:'numericedit'},
-  { field:'progress', headerText:'Progress', width:'90', textAlign:'Right'  , editType:'numericedit'},
-   { field:'priority' ,headerText:'Priority' ,width:'80' ,textAlign:'Right'   ,editType:'stringedit'},
-   { field:'approved', headerText:'Approved', width:'80', textAlign:'Right'  , editType:'stringedit'}];
-
-}
+      {
+        field: 'id',
+        headerText: 'ID',
+        isPrimaryKey: 'true',
+        width: '140',
+        textAlign: 'Right',
+        editType: 'numericedit',
+      },
+      { field: 'taskName', headerText: 'Task Name', width: '110' },
+      { field: 'resourceCount', headerText: 'Resource Count', width: '90' },
+      { field: 'team', headerText: 'Team', width: '70' },
+      {
+        field: 'duration',
+        headerText: 'Duration',
+        width: '85',
+        textAlign: 'Right',
+        editType: 'numericedit',
+      },
+      {
+        field: 'progress',
+        headerText: 'Progress',
+        width: '90',
+        textAlign: 'Right',
+        editType: 'numericedit',
+      },
+      {
+        field: 'priority',
+        headerText: 'Priority',
+        width: '80',
+        textAlign: 'Right',
+        editType: 'stringedit',
+      },
+      {
+        field: 'approved',
+        headerText: 'Approved',
+        width: '80',
+        textAlign: 'Right',
+        editType: 'stringedit',
+      },
+    ];
+  }
   // while clicking options in context menu
   contextMenuClick(args?): void {
     if (args.item.id === 'addnext') {
@@ -206,16 +243,18 @@ export class TableComponent implements OnInit {
       this.addchild(args);
     } else if (args.item.id === 'delete' && args.item.target === '.e-content') {
       this.taskService.deleteTask(args.rowInfo.rowData.taskData.key);
-    } else if (args.item.id === 'cut') {
-      this.treeGridObj.copy();
-      this.treeGridObj.deleteRecord();
-    } else if (args.item.id === 'copy') {
-      //
-    } else if (args.item.id === 'paste') {
-      //
+    } else if (args.item.id === 'cut' && args.item.target === '.e-content') {
+      this.copiedTasks = [];
+      this.copiedTasks.push(this.getItemById(args.rowInfo.rowData.taskData.id));
+      this.taskService.deleteTask(args.rowInfo.rowData.taskData.key);
+    } else if (args.item.id === 'copy' && args.item.target === '.e-content') {
+      this.copiedTasks = [];
+      this.copiedTasks.push(this.getItemById(args.rowInfo.rowData.taskData.id));
+    } else if (args.item.id === 'paste' && args.item.target === '.e-content') {
+      this.pasteRecords(this.copiedTasks);
     } else if (args.item.text === 'Edit Record') {
       this.editRecord(args);
-    }else if (args.item.id === 'freeze') {
+    } else if (args.item.id === 'freeze') {
       /*const treegridtreegridcomp = window.localStorage.getItem('treegridtreegridcomp');
       const treegridtreegridcompJSON = JSON.parse(treegridtreegridcomp);
 
@@ -226,10 +265,9 @@ export class TableComponent implements OnInit {
           }
         });
       }*/
-
-    }else if (args.item.id === 'insert') {
+    } else if (args.item.id === 'insert') {
       let columnName = { field: 'data', width: 100 };
-    // this.treegrid.columns.push(columnName); // Insert Columns
+      // this.treegrid.columns.push(columnName); // Insert Columns
       this.treegrid.refreshColumns(); // Refresh Columns
     } else if (args.item.id === 'deleteColumn') {
       const columnName = 2;
@@ -303,6 +341,12 @@ export class TableComponent implements OnInit {
       newRowPosition: 'Child',
     };
     const index = data.index;
+  }
+
+  pasteRecords(tasks: any): void {
+    for (const task of tasks) {
+      this.taskService.createTask(task);
+    }
   }
 
   // on Hierachy mode changes
