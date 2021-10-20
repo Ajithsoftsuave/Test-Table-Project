@@ -61,8 +61,9 @@ export class TableComponent implements OnInit {
   gridInstance: any;
   public task: Task;
   public childRow: Task;
+  // tslint:disable-next-line: ban-types
   public contextMenuValue: Object;
-  treegridColumns: Array<any> = new Array;
+  treegridColumns: Array<any> = new Array();
   constructor(
     private clipboardService: ClipboardService,
     private taskService: TaskService,
@@ -71,21 +72,21 @@ export class TableComponent implements OnInit {
     // this.data = sampleData;
     taskService.getTaskList().subscribe((data) => {
       this.responseData = data;
-      console.log('incoming data', data)
-      for (const singleRecord of data){
-        if (!singleRecord.isSubtask){
-        if (singleRecord.subtasks){
-          this.tableData.push(this.appendSubTasks(singleRecord));
-        }else{
-          this.tableData.push(singleRecord);
+      console.log('incoming data', data);
+      for (const singleRecord of data) {
+        if (!singleRecord.isSubtask) {
+          if (singleRecord.subtasks) {
+            this.tableData.push(this.appendSubTasks(singleRecord));
+          } else {
+            this.tableData.push(singleRecord);
+          }
         }
-      }}
+      }
       console.log(this.tableData);
     });
   }
 
   ngOnInit(): void {
-
     // items should be in context menu. type string are default, type object are custom options
     this.contextMenuItems = [
       { text: 'Add Next', target: '.e-content', id: 'addnext' },
@@ -124,10 +125,15 @@ export class TableComponent implements OnInit {
       'NextPage',
       { text: 'Insert Column', target: '.e-headercontent', id: 'insert' },
       { text: 'Delete Column', target: '.e-headercontent', id: 'deleteColumn' },
-      { text: 'Rename Column', target: '.e-headercontent', id: 'rename' }
+      { text: 'Rename Column', target: '.e-headercontent', id: 'rename' },
     ];
 
-    this.editing = { allowDeleting: true, allowEditing: true, allowAdding: true, mode: 'Row' };
+    this.editing = {
+      allowDeleting: true,
+      allowEditing: true,
+      allowAdding: true,
+      mode: 'Row',
+    };
     this.editparams = { params: { format: 'n' } };
 
     this.dropData = [
@@ -142,65 +148,96 @@ export class TableComponent implements OnInit {
   }
 
   // append subtasks
-  public appendSubTasks(parentTask: Task): Task{
+  public appendSubTasks(parentTask: Task): Task {
     // tslint:disable-next-line: prefer-for-of
-    console.log('current parent task', parentTask)
-    for (let i = 0; i < parentTask.subtasks.length; i++){
-      if (this.getItemById(parentTask.subtasks[i])?.subtasks){
-        parentTask.subtasks[i] = this.appendSubTasks(this.getItemById(parentTask.subtasks[i]));
-      } else{
+    console.log('current parent task', parentTask);
+    for (let i = 0; i < parentTask.subtasks.length; i++) {
+      if (this.getItemById(parentTask.subtasks[i])?.subtasks) {
+        parentTask.subtasks[i] = this.appendSubTasks(
+          this.getItemById(parentTask.subtasks[i])
+        );
+      } else {
         const fetchedRecord = this.getItemById(parentTask.subtasks[i]);
-        if (fetchedRecord){
-        parentTask.subtasks[i] = this.getItemById(parentTask.subtasks[i]);
-        } else{
+        if (fetchedRecord) {
+          parentTask.subtasks[i] = this.getItemById(parentTask.subtasks[i]);
+        } else {
           delete parentTask.subtasks[i];
         }
       }
     }
-
     return parentTask;
   }
 
   // fetching record by Id
-  public getItemById(id: string): Task{
-    for (const task of this.responseData){
-      if ( id === task.id ){
+  public getItemById(id: string): Task {
+    for (const task of this.responseData) {
+      if (id === task.id) {
         return task;
       }
     }
     return null;
   }
 
-  getIndexById(id: string): number{
+  getIndexById(id: string): number {
     // tslint:disable-next-line: prefer-for-of
-    for (let index = 0; index < this.responseData.length; index++){
-      if ( id === this.responseData[index].id ){
+    for (let index = 0; index < this.responseData.length; index++) {
+      if (id === this.responseData[index].id) {
         return index;
       }
     }
     return null;
   }
 
-  // tslint:disable-next-line: use-lifecycle-interface
-  ngAfterViewInit(){
+  ngAfterViewInit() {
     this.treegridColumns = [
-   {field: 'id', headerText: 'ID', isPrimaryKey: 'true', width: '140', textAlign: 'Right' ,editType:'numericedit'},
-   { field:'taskName' ,headerText:'Task Name', width:'110'},
-   {field:'resourceCount', headerText:'Resource Count', width:'90'},
-   {field:'team', headerText:'Team', width:'70'},
-  { field:'duration' ,headerText:'Duration', width:'85', textAlign:'Right', editType:'numericedit'},
-  { field:'progress', headerText:'Progress', width:'90', textAlign:'Right'  , editType:'numericedit'},
-   { field:'priority' ,headerText:'Priority' ,width:'80' ,textAlign:'Right'   ,editType:'stringedit'},
-   { field:'approved', headerText:'Approved', width:'80', textAlign:'Right'  , editType:'stringedit'}]; 
-    
-} 
+      {
+        field: 'id',
+        headerText: 'ID',
+        isPrimaryKey: 'true',
+        width: '140',
+        textAlign: 'Right',
+        editType: 'numericedit',
+      },
+      { field: 'taskName', headerText: 'Task Name', width: '110' },
+      { field: 'resourceCount', headerText: 'Resource Count', width: '90' },
+      { field: 'team', headerText: 'Team', width: '70' },
+      {
+        field: 'duration',
+        headerText: 'Duration',
+        width: '85',
+        textAlign: 'Right',
+        editType: 'numericedit',
+      },
+      {
+        field: 'progress',
+        headerText: 'Progress',
+        width: '90',
+        textAlign: 'Right',
+        editType: 'numericedit',
+      },
+      {
+        field: 'priority',
+        headerText: 'Priority',
+        width: '80',
+        textAlign: 'Right',
+        editType: 'stringedit',
+      },
+      {
+        field: 'approved',
+        headerText: 'Approved',
+        width: '80',
+        textAlign: 'Right',
+        editType: 'stringedit',
+      },
+    ];
+  }
   // while clicking options in context menu
   contextMenuClick(args?): void {
     if (args.item.id === 'addnext') {
       this.addnext(args);
     } else if (args.item.id === 'addchild') {
       this.addchild(args);
-    } else if (args.item.id === 'delete' && args.item.target === ".e-content") {
+    } else if (args.item.id === 'delete' && args.item.target === '.e-content') {
       this.taskService.deleteTask(args.rowInfo.rowData.taskData.key);
     } else if (args.item.id === 'cut') {
       this.treeGridObj.copy();
@@ -209,12 +246,12 @@ export class TableComponent implements OnInit {
       //
     } else if (args.item.id === 'paste') {
       //
-    } else if (args.item.text === 'Edit Record'){
+    } else if (args.item.text === 'Edit Record') {
       this.editRecord(args);
     }
     if (args.item.id === 'insert') {
-      let columnName = { field: 'data', width: 100 };
-    // this.treegrid.columns.push(columnName); // Insert Columns
+      const columnName = { field: 'data', width: 100 };
+      // this.treegrid.columns.push(columnName); // Insert Columns
       this.treegrid.refreshColumns(); // Refresh Columns
     } else if (args.item.id === 'deleteColumn') {
       const columnName = 2;
@@ -232,23 +269,27 @@ export class TableComponent implements OnInit {
       id: uuidv4(),
       taskName: null,
       resourceCount: null,
-      team: 'null',
+      team: null,
       progress: null,
       duration: null,
       priority: null,
       approved: null,
-      isSubtask : null,
-      subtasks : null
+      isSubtask: null,
+      subtasks: null,
     };
-    this.responseData.splice(this.getIndexById(data.rowInfo.rowData.taskData.id) + 1, 0, this.childRow);
+    this.responseData.splice(
+      this.getIndexById(data.rowInfo.rowData.taskData.id) + 1,
+      0,
+      this.childRow
+    );
     console.log(this.responseData);
-    // this.taskService.createTask(this.childRow);
+    this.taskService.createTask(this.childRow);
   }
 
   addchild(args: any): void {
     const newRecordId = uuidv4();
     this.childRow = {
-      id : newRecordId,
+      id: newRecordId,
       taskName: null,
       resourceCount: null,
       team: null,
@@ -256,24 +297,28 @@ export class TableComponent implements OnInit {
       duration: null,
       priority: null,
       approved: null,
-      isSubtask : true,
-      subtasks : null
+      isSubtask: true,
+      subtasks: null,
     };
     this.taskService.createTask(this.childRow);
-    const recordToUpdate: Task = this.getItemById(args.rowInfo.rowData.taskData.id);
+    const recordToUpdate: Task = this.getItemById(
+      args.rowInfo.rowData.taskData.id
+    );
     console.log(recordToUpdate.subtasks);
-    if (recordToUpdate.subtasks){
-      for (let index = 0; index < recordToUpdate.subtasks.length ; index++){
-        recordToUpdate.subtasks[index] = recordToUpdate.subtasks[index].id ;
+    if (recordToUpdate.subtasks) {
+      for (let index = 0; index < recordToUpdate.subtasks.length; index++) {
+        recordToUpdate.subtasks[index] = recordToUpdate.subtasks[index].id;
       }
       recordToUpdate.subtasks.push(newRecordId);
     } else {
       recordToUpdate.subtasks = [newRecordId];
     }
-    this.taskService.updateTask(args.rowInfo.rowData.taskData.key , recordToUpdate);
-
+    this.taskService.updateTask(
+      args.rowInfo.rowData.taskData.key,
+      recordToUpdate
+    );
   }
-  editRecord(data: any): void{
+  editRecord(data: any): void {
     this.editing = {
       allowEditing: true,
       allowAdding: true,
@@ -292,7 +337,7 @@ export class TableComponent implements OnInit {
 
   public addTask(): any {
     this.task = {
-      id: '90858fa0-fafe-4871-ad8c-6ff9fa9947ff',
+      id: '91858fa0-fafe-4871-ad8c-6ff9fa9947ff',
       taskName: 'Paren task 3',
       resourceCount: 10,
       team: 'Test team',
@@ -301,7 +346,7 @@ export class TableComponent implements OnInit {
       priority: 'Normal',
       approved: false,
       isSubtask: false,
-      subtasks: null
+      subtasks: null,
     };
 
     this.taskService.createTask(this.task);
