@@ -70,6 +70,7 @@ export class TableComponent implements OnInit {
     // this.data = sampleData;
     taskService.getTaskList().subscribe((data) => {
       this.responseData = data;
+      console.log('incoming data', data)
       for (const singleRecord of data){
         if (!singleRecord.isSubtask){
         if (singleRecord.subtasks){
@@ -111,9 +112,9 @@ export class TableComponent implements OnInit {
       { text: 'New', target: '.e-gridheader', id: 'new' },
       { text: 'Delete', target: '.e-gridheader', id: 'delete' },
       { text: 'Edit', target: '.e-gridheader', id: 'edit' },
-      { text: 'Freeze', target: '.e-gridheader', id: 'paste' },
-      { text: 'Filter', target: '.e-gridheader', id: 'paste' },
-      { text: 'Multisort', target: '.e-gridheader', id: 'paste' },
+      { text: 'Freeze', target: '.e-gridheader', id: 'freeze' },
+      { text: 'Filter', target: '.e-gridheader', id: 'filter' },
+      { text: 'Multisort', target: '.e-gridheader', id: 'multiSort' },
       'Save',
       'Cancel',
       'FirstPage',
@@ -139,9 +140,10 @@ export class TableComponent implements OnInit {
   // append subtasks
   public appendSubTasks(parentTask: Task): Task{
     // tslint:disable-next-line: prefer-for-of
+    console.log('current parent task', parentTask)
     for (let i = 0; i < parentTask.subtasks.length; i++){
       if (this.getItemById(parentTask.subtasks[i])?.subtasks){
-        parentTask.subtasks[i] = this.appendSubTasks(parentTask.subtasks[i]);
+        parentTask.subtasks[i] = this.appendSubTasks(this.getItemById(parentTask.subtasks[i]));
       } else{
         const fetchedRecord = this.getItemById(parentTask.subtasks[i]);
         if (fetchedRecord){
@@ -195,36 +197,45 @@ export class TableComponent implements OnInit {
     }
   }
 
+  addnext(data: any): void {
+    this.childRow = {
+      id: uuidv4(),
+      taskName: null,
+      resourceCount: null,
+      team: 'null',
+      progress: null,
+      duration: null,
+      priority: null,
+      approved: null,
+      isSubtask : null,
+      subtasks : null
+    };
+    this.responseData.splice(this.getIndexById(data.rowInfo.rowData.taskData.id) + 1, 0, this.childRow);
+    console.log(this.responseData);
+    // this.taskService.createTask(this.childRow);
+  }
+
   addchild(args: any): void {
     const newRecordId = uuidv4();
     this.childRow = {
       id : newRecordId,
       taskName: null,
-      resourceCount: 0,
+      resourceCount: null,
       team: null,
       progress: null,
       duration: null,
       priority: null,
-      approved: false,
+      approved: null,
       isSubtask : true,
       subtasks : null
     };
-    /*
-    this.taskService.createTask(this.childRow);
-    this.editing = {
-      allowEditing: true,
-      allowAdding: true,
-      allowDeleting: true,
-      mode: 'Row',
-      newRowPosition: 'Child',
-    };
-
-    const index = data.index;
-    this.treeGridObj.selectRow(index); // select the newly added row to scroll to it */
     this.taskService.createTask(this.childRow);
     const recordToUpdate: Task = this.getItemById(args.rowInfo.rowData.taskData.id);
     console.log(recordToUpdate.subtasks);
     if (recordToUpdate.subtasks){
+      for (let index = 0; index < recordToUpdate.subtasks.length ; index++){
+        recordToUpdate.subtasks[index] = recordToUpdate.subtasks[index].id ;
+      }
       recordToUpdate.subtasks.push(newRecordId);
     } else {
       recordToUpdate.subtasks = [newRecordId];
@@ -243,24 +254,6 @@ export class TableComponent implements OnInit {
     const index = data.index;
   }
 
-  addnext(data: any): void {
-    this.childRow = {
-      id: uuidv4(),
-      taskName: null,
-      resourceCount: null,
-      team: 'null',
-      progress: null,
-      duration: null,
-      priority: null,
-      approved: null,
-      isSubtask : false,
-      subtasks : null
-    };
-    this.responseData.splice(this.getIndexById(data.rowInfo.rowData.taskData.id) + 1, 0, this.childRow);
-    console.log(this.responseData);
-    // this.taskService.createTask(this.childRow);
-  }
-
   // on Hierachy mode changes
   onChange(e: ChangeEventArgs): any {
     const mode: any = e.value as string;
@@ -269,7 +262,7 @@ export class TableComponent implements OnInit {
 
   public addTask(): any {
     this.task = {
-      id: '70858fa0-fafe-4871-ad8c-6ff9fa9947ff',
+      id: '90858fa0-fafe-4871-ad8c-6ff9fa9947ff',
       taskName: 'Paren task 3',
       resourceCount: 10,
       team: 'Test team',
