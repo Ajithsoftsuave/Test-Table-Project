@@ -112,7 +112,7 @@ export class TableComponent implements OnInit {
       { text: 'New', target: '.e-gridheader', id: 'new' },
       { text: 'Delete', target: '.e-gridheader', id: 'delete' },
       { text: 'Edit', target: '.e-gridheader', id: 'edit' },
-      { text: 'Freeze', target: '.e-gridheader', id: 'paste' },
+      { text: 'Freeze', target: '.e-gridheader', id: 'freeze' },
       { text: 'Filter', target: '.e-gridheader', id: 'paste' },
       { text: 'Multisort', target: '.e-gridheader', id: 'paste' },
       'Save',
@@ -179,8 +179,8 @@ export class TableComponent implements OnInit {
     return null;
   }
 
-  ngAfterViewInit(){  
-    this.treegridColumns = [ 
+  ngAfterViewInit(): void{
+    this.treegridColumns = [
    {field:'id', headerText:'ID', isPrimaryKey:'true', width:'140', textAlign:'Right' ,editType:'numericedit'},
    { field:'taskName' ,headerText:'Task Name', width:'110'},
    {field:'resourceCount', headerText:'Resource Count', width:'90'},
@@ -188,9 +188,9 @@ export class TableComponent implements OnInit {
   { field:'duration' ,headerText:'Duration', width:'85', textAlign:'Right', editType:'numericedit'},
   { field:'progress', headerText:'Progress', width:'90', textAlign:'Right'  , editType:'numericedit'},
    { field:'priority' ,headerText:'Priority' ,width:'80' ,textAlign:'Right'   ,editType:'stringedit'},
-   { field:'approved', headerText:'Approved', width:'80', textAlign:'Right'  , editType:'stringedit'}]; 
-    
-} 
+   { field:'approved', headerText:'Approved', width:'80', textAlign:'Right'  , editType:'stringedit'}];
+
+}
   // while clicking options in context menu
   contextMenuClick(args?): void {
     if (args.item.id === 'addnext') {
@@ -208,8 +208,19 @@ export class TableComponent implements OnInit {
       //
     } else if (args.item.text === 'Edit Record'){
       this.editRecord(args);
-    }
-    if (args.item.id === 'insert') {
+    }else if (args.item.id === 'freeze') {
+      /*const treegridtreegridcomp = window.localStorage.getItem('treegridtreegridcomp');
+      const treegridtreegridcompJSON = JSON.parse(treegridtreegridcomp);
+
+      if (treegridtreegridcomp) {
+       treegridtreegridcompJSON.columns.map((column, index) => {
+          if (column  && column.field && args && args.column && column.field === args.column.field ) {
+            this.treeGridObj.frozenColumns = index + 1;
+          }
+        });
+      }*/
+
+    }else if (args.item.id === 'insert') {
       let columnName = { field: 'data', width: 100 };
     // this.treegrid.columns.push(columnName); // Insert Columns
       this.treegrid.refreshColumns(); // Refresh Columns

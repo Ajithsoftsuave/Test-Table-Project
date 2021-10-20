@@ -14,6 +14,8 @@ import { AngularFireStorageModule } from '@angular/fire/storage';
 import { ReorderService} from '@syncfusion/ej2-angular-treegrid';
 import { ResizeService } from '@syncfusion/ej2-angular-treegrid';
 import { environment } from 'src/environments/environment';
+import {SortService } from '@syncfusion/ej2-angular-treegrid';
+import {FilterService} from '@syncfusion/ej2-angular-treegrid';
 
 @NgModule({
   declarations: [
@@ -35,7 +37,9 @@ import { environment } from 'src/environments/environment';
   providers: [
     ReorderService,
     ResizeService,
-    FreezeService
+    FreezeService,
+    SortService,
+    FilterService
   ],
   bootstrap: [AppComponent]
 })
