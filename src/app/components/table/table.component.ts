@@ -187,7 +187,8 @@ export class TableComponent implements OnInit {
 
   // tslint:disable-next-line:typedef
   public openContextMenu(args?) {
-     if (args.rowInfo.target.classList.contains('e-headercell') || args.rowInfo.target.classList.contains('e-headercelldiv')) {
+    // tslint:disable-next-line:max-line-length
+     if (args.rowInfo.target.classList.contains('e-headercell') || args.rowInfo.target.classList.contains('e-headercelldiv') || args.rowInfo.target.classList.contains('e-headertext') ) {
        this.activeContextMenuColumn = args.column;
      }
   }
