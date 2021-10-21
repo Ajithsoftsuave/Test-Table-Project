@@ -304,15 +304,9 @@ export class TableComponent implements OnInit {
       const data = args.column.field;
       this.treegrid.getColumnByField(data).headerText = 'Task details'; // Rename column name
       this.treegrid.refreshColumns(); // Refresh Columns
-    } else if (args.item.id === 'al-right') {
-
-
-    } else if (args.item.id === 'al-left') {
-
-    } else if (args.item.id === 'al-center') {
-
-    } else if (args.item.id === 'al-justify') {
-
+    } else if (args.item.id === 'al-right' || args.item.id === 'al-left' || args.item.id === 'al-center' || args.item.id === 'al-justify') {
+      this.treegrid.getColumnByField(this.activeContextMenuColumn.field).textAlign = args.item.text;
+      this.treegrid.refreshColumns();
     }
   }
 
