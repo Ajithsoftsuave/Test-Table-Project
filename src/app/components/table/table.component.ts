@@ -108,7 +108,7 @@ export class TableComponent implements OnInit {
           { text: 'Default-Value', id: 'defaultvalue' },
           { text: 'Minimum-Column-Width', id: 'minwidth' },
           { text: 'Font-size', id: 'fontsize' },
-          { text: 'Font-color', id: 'fontcolor', items: [ { text: 'white', id: 'cl-white' }, { text: 'black', id: 'bg-black' }]},
+          { text: 'Font-color', id: 'fontcolor', items: [ { text: 'white', id: 'cl-white' }, { text: 'black', id: 'cl-black' }]},
           { text: 'Background-color', id: 'bgcolr' , items: [ { text: 'red', id: 'bg-red' }, { text: 'blue', id: 'bg-blue' }, { text: 'white', id: 'bg-white' }] },
           { text: 'Alignment', id: 'alignment' , items: [ { text: 'Right', id: 'al-right' }, { text: 'Left', id: 'al-left' }, { text: 'Center', id: 'al-center' }, { text: 'Justify', id: 'al-justify' }] },
           { text: 'Text-wrap', id: 'textwrap' , items: [ { text: 'Clip', id: 'tw-clip' }, { text: 'EllipsisWithTooltip', id: 'tw-ellipsis-tooltip' }, { text: 'Ellipsis', id: 'tw-ellipsis' }] },
@@ -327,6 +327,23 @@ export class TableComponent implements OnInit {
       // @ts-ignore
        this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.push(args.item.id);
        this.treegrid.refreshColumns();
+    }else if (args.item.id === 'cl-white' || args.item.id === 'cl-black' ) {
+      let clindex = -1;
+      // @ts-ignore
+      this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.forEach((a, index) => {
+        if (a.includes('cl')) {
+          clindex = index;
+        }
+      });
+
+      if (clindex !== -1) {
+        // @ts-ignore
+        this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.splice(bgindex, 1);
+      }
+
+      // @ts-ignore
+      this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.push(args.item.id);
+      this.treegrid.refreshColumns();
     }
   }
 

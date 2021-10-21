@@ -25,6 +25,13 @@ th.e-headercell.bg-white {
   background-color: white;
 }
 
+th.e-headercell.cl-white {
+  color: white;
+}
+th.e-headercell.cl-black {
+  color: black;
+}
+
 //
 
 td.e-rowcell.bg-red {
@@ -35,4 +42,12 @@ td.e-rowcell.bg-blue {
 }
 td.e-rowcell.bg-white {
   background-color: white;
+}
+
+td.e-rowcell.cl-white {
+  color: white;
+}
+
+td.e-rowcell.cl-black {
+  color: black;
 }
