@@ -32,14 +32,26 @@ th.e-headercell.cl-black {
   color: black;
 }
 
+th.e-headercell.fs-10 {
+  font-size: 10px !important;
+}
+th.e-headercell.fs-13 {
+  font-size: 13px !important;
+}
+th.e-headercell.fs-20 {
+  font-size: 20px !important;
+}
+
 //
 
 td.e-rowcell.bg-red {
   background-color: red;
 }
+
 td.e-rowcell.bg-blue {
   background-color: #8e8ec7;
 }
+
 td.e-rowcell.bg-white {
   background-color: white;
 }
@@ -50,4 +62,16 @@ td.e-rowcell.cl-white {
 
 td.e-rowcell.cl-black {
   color: black !important;
+}
+
+td.e-rowcell.fs-10 {
+  font-size: 10px !important;
+}
+
+td.e-rowcell.fs-13 {
+  font-size: 13px !important;
+}
+
+td.e-rowcell.fs-20 {
+  font-size: 20px !important;
 }
