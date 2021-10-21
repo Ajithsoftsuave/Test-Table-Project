@@ -5,7 +5,7 @@ import {
   PageService,
   EditService,
   ContextMenuService,
-  TreeGridComponent,
+  TreeGridComponent, ColumnChooserService, ToolbarService,
 } from '@syncfusion/ej2-angular-treegrid';
 import { EditSettingsModel, ToolbarItems } from '@syncfusion/ej2-treegrid';
 import { MenuEventArgs } from '@syncfusion/ej2-navigations';
@@ -31,6 +31,8 @@ import { element } from 'protractor';
     PageService,
     EditService,
     ContextMenuService,
+    ToolbarService,
+    ColumnChooserService
   ],
 })
 export class TableComponent implements OnInit {
@@ -56,8 +58,9 @@ export class TableComponent implements OnInit {
   // tslint:disable-next-line: ban-types
   public fields: Object;
   public selectionOptions: SelectionSettingsModel;
-  public toolbar: ToolbarItems[];
+  public toolbar: any;
   public selectedIndex = -1;
+  public freezeIndex = 0;
   gridInstance: any;
   public task: Task;
   public childRow: Task;
@@ -135,7 +138,7 @@ export class TableComponent implements OnInit {
     ];
     this.fields = { text: 'mode', value: 'id' };
     this.selectionOptions = { type: 'Multiple' };
-    this.toolbar = ['Add', 'Edit', 'Update', 'Cancel'];
+    this.toolbar = ['ColumnChooser'];
   }
 
   // Stucture the DB data to treegrid
@@ -258,20 +261,21 @@ export class TableComponent implements OnInit {
       this.pasteChildRecords(this.copiedTasks, args.rowInfo.rowData.taskData.id, args.rowInfo.rowData.taskData.key);
     } else if (args.item.text === 'Edit Record') {
       this.editRecord(args);
-    } else if (args.item.id === 'freeze') {
-      /*const treegridtreegridcomp = window.localStorage.getItem('treegridtreegridcomp');
+    }else if (args.item.id === 'freeze') {
+      const treegridtreegridcomp = window.localStorage.getItem('treegridtreegridcomp');
       const treegridtreegridcompJSON = JSON.parse(treegridtreegridcomp);
 
       if (treegridtreegridcomp) {
        treegridtreegridcompJSON.columns.map((column, index) => {
           if (column  && column.field && args && args.column && column.field === args.column.field ) {
-            this.treeGridObj.frozenColumns = index + 1;
+            this.freezeIndex = index + 1;
           }
         });
-      }*/
-    } else if (args.item.id === 'insert') {
+      }
+
+    }else if (args.item.id === 'insert') {
       const columnName = { field: 'data', width: 100 };
-      // this.treegrid.columns.push(columnName); // Insert Columns
+    // this.treegrid.columns.push(columnName); // Insert Columns
       this.treegrid.refreshColumns(); // Refresh Columns
     } else if (args.item.id === 'deleteColumn') {
       const columnName = 2;
