@@ -44,8 +44,10 @@ export class TableComponent implements OnInit {
   public editing: EditSettingsModel;
   // tslint:disable-next-line: ban-types
   public editparams: Object;
-  // tslint:disable-next-line: ban-types
-  public contextMenuItems: Object[];
+
+  private activeContextMenuColumn;
+
+  public contextMenuItems;
   @ViewChild('treegrid')
   public treeGridObj: TreeGridComponent;
 
@@ -91,7 +93,7 @@ export class TableComponent implements OnInit {
       { text: 'Paste', target: '.e-content', id: 'paste' },
       {
         text: 'Style',
-        target: '.e-gridheader',
+        target: '.e-headercell',
         id: 'paste',
         items: [
           { text: 'Data-Type', id: 'datatype' },
@@ -100,16 +102,16 @@ export class TableComponent implements OnInit {
           { text: 'Font-size', id: 'fontsize' },
           { text: 'Font-color', id: 'fontcolor' },
           { text: 'Background-color', id: 'bgcolr' },
-          { text: 'Alignment', id: 'alignment' },
-          { text: 'Text-wrap', id: 'textwrap' },
+          { text: 'Alignment', id: 'alignment' , items: [ { text: 'Right', id: 'al-right' }, { text: 'Left', id: 'al-left' }, { text: 'Center', id: 'al-center' }, { text: 'Justify', id: 'al-justify' }] },
+          { text: 'Text-wrap', id: 'textwrap'},
         ],
       },
-      { text: 'New', target: '.e-gridheader', id: 'new' },
-      { text: 'Delete', target: '.e-gridheader', id: 'delete' },
-      { text: 'Edit', target: '.e-gridheader', id: 'edit' },
-      { text: 'Freeze', target: '.e-gridheader', id: 'freeze' },
-      { text: 'Filter', target: '.e-gridheader', id: 'paste' },
-      { text: 'Multisort', target: '.e-gridheader', id: 'paste' },
+      { text: 'New', target: '.e-headercell', id: 'new' },
+      { text: 'Delete', target: '.e-headercell', id: 'delete' },
+      { text: 'Edit', target: '.e-headercell', id: 'edit' },
+      { text: 'Freeze', target: '.e-headercell', id: 'freeze' },
+      { text: 'Filter', target: '.e-headercell', id: 'paste' },
+      { text: 'Multisort', target: '.e-headercell', id: 'paste' },
       'Save',
       'Cancel',
       'FirstPage',
@@ -173,6 +175,13 @@ export class TableComponent implements OnInit {
       }
     }
     return parentTask;
+  }
+
+  // tslint:disable-next-line:typedef
+  public openContextMenu(args?) {
+     if (args.rowInfo.target.classList.contains('e-headercell') || args.rowInfo.target.classList.contains('e-headercelldiv')) {
+       this.activeContextMenuColumn = args.column;
+     }
   }
 
   // fetching record by Id
@@ -263,7 +272,7 @@ export class TableComponent implements OnInit {
 
       if (treegridtreegridcomp) {
        treegridtreegridcompJSON.columns.map((column, index) => {
-          if (column  && column.field && args && args.column && column.field === args.column.field ) {
+          if (column && column.field === this.activeContextMenuColumn.field ) {
             this.freezeIndex = index + 1;
           }
         });
@@ -281,6 +290,15 @@ export class TableComponent implements OnInit {
       const data = args.column.field;
       this.treegrid.getColumnByField(data).headerText = 'Task details'; // Rename column name
       this.treegrid.refreshColumns(); // Refresh Columns
+    } else if (args.item.id === 'al-right') {
+
+
+    } else if (args.item.id === 'al-left') {
+
+    } else if (args.item.id === 'al-center') {
+
+    } else if (args.item.id === 'al-justify') {
+
     }
   }
 
