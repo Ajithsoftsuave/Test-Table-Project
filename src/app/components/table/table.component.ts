@@ -20,6 +20,7 @@ import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { v4 as uuidv4 } from 'uuid';
 import { element } from 'protractor';
+import { FormBuilder, FormGroup, Validator } from '@angular/forms';
 
 @Component({
   selector: 'app-table',
@@ -66,10 +67,16 @@ export class TableComponent implements OnInit {
   gridInstance: any;
   public task: Task;
   public childRow: Task;
+  public formTask: Task;
+  public editKey: any;
   // tslint:disable-next-line: ban-types
   public contextMenuValue: Object;
   treegridColumns: Array<any> = new Array();
+  taskForm: FormGroup;
+  isEditing = false;
+
   constructor(
+    private fb: FormBuilder,
     private clipboardService: ClipboardService,
     private taskService: TaskService,
     private db: AngularFireDatabase
@@ -87,10 +94,11 @@ export class TableComponent implements OnInit {
       { text: 'Add Next', target: '.e-content', id: 'addnext' },
       { text: 'Add Child', target: '.e-content', id: 'addchild' },
       { text: 'Delete', target: '.e-content', id: 'delete' },
-      'Edit',
+      { text: 'Edit', target: '.e-content', id: 'edit' },
       { text: 'Copy', target: '.e-content', id: 'copy' },
       { text: 'Cut', target: '.e-content', id: 'cut' },
-      { text: 'Paste', target: '.e-content', id: 'paste' },
+      { text: 'Paste Next', target: '.e-content', id: 'pastenext' },
+      { text: 'Paste Child', target: '.e-content', id: 'pastechild' },
       {
         text: 'Style',
         target: '.e-headercell',
@@ -204,6 +212,7 @@ export class TableComponent implements OnInit {
     return null;
   }
 
+  // tslint:disable-next-line: use-lifecycle-interface
   ngAfterViewInit(): void {
     this.treegridColumns = [
       {
@@ -262,10 +271,12 @@ export class TableComponent implements OnInit {
     } else if (args.item.id === 'copy' && args.item.target === '.e-content') {
       this.copiedTasks = [];
       this.copiedTasks.push(this.getItemById(args.rowInfo.rowData.taskData.id));
-    } else if (args.item.id === 'paste' && args.item.target === '.e-content') {
-      this.pasteRecords(this.copiedTasks);
-    } else if (args.item.text === 'Edit Record') {
-      this.editRecord(args);
+    } else if (args.item.id === 'pastenext' && args.item.target === '.e-content') {
+      this.pasteNextRecords(this.copiedTasks);
+    } else if (args.item.id === 'pastechild' && args.item.target === '.e-content') {
+      this.pasteChildRecords(this.copiedTasks, args.rowInfo.rowData.taskData.id, args.rowInfo.rowData.taskData.key);
+    } else if (args.item.id === 'edit' && args.item.target === '.e-content') {
+      this.editRow(args.rowInfo.rowData.taskData, args.rowInfo.rowData.taskData.key);
     }else if (args.item.id === 'freeze') {
       const treegridtreegridcomp = window.localStorage.getItem('treegridtreegridcomp');
       const treegridtreegridcompJSON = JSON.parse(treegridtreegridcomp);
@@ -365,10 +376,82 @@ export class TableComponent implements OnInit {
     const index = data.index;
   }
 
-  pasteRecords(tasks: any): void {
+  pasteNextRecords(tasks: any): void {
+    if (!tasks){
+      alert('No copied value');
+      return;
+    }
     for (const task of tasks) {
+      task.id = uuidv4();
       this.taskService.createTask(task);
     }
+  }
+
+  pasteChildRecords(tasks: any, parentTaskId: string, key: string): void {
+    if (!tasks){
+      alert('No copied value');
+      return;
+    }
+    for (const task of tasks) {
+      if (task.id === parentTaskId){
+        alert('can not paste same task as child task to itsekf');
+        return;
+      }
+      task.isSubtask = true;
+      task.id = uuidv4();
+      this.taskService.createTask(task);
+    }
+    const recordToUpdate: Task = this.getItemById(
+      parentTaskId
+    );
+    if (recordToUpdate.subtasks) {
+      for (let index = 0; index < recordToUpdate.subtasks.length; index++) {
+        recordToUpdate.subtasks[index] = recordToUpdate.subtasks[index].id;
+      }
+      for (const task of tasks){
+        recordToUpdate.subtasks.push(task.id);
+      }
+    } else {
+      for (let index = 0; index < tasks.length; index++){
+        if (index === 0) {
+          recordToUpdate.subtasks = [(tasks[index].id)];
+        } else {
+          recordToUpdate.subtasks.push(tasks[index].id);
+        }
+      }
+    }
+    this.taskService.updateTask(
+      key,
+      recordToUpdate
+    );
+  }
+
+  editRow(task: any, key: string): void{
+    this.editKey = key;
+    this.formTask = task;
+    this.isEditing = true;
+    this.taskForm = this.fb.group({
+      id: [task.id],
+      taskName: [task.taskName],
+      resourceCount: [task.resourceCount],
+      team: [task.team],
+      progress: [task.progress],
+      duration: [task.duration],
+      priority: [task.priority],
+      approved: [task.approved],
+    });
+  }
+
+  onFormSubmit(): void{
+    this.formTask.taskName = this.taskForm.get('taskName').value;
+    this.formTask.resourceCount = this.taskForm.get('resourceCount').value;
+    this.formTask.progress = this.taskForm.get('progress').value;
+    this.formTask.duration = this.taskForm.get('duration').value;
+    this.formTask.priority = this.taskForm.get('priority').value;
+    this.formTask.approved = this.taskForm.get('approved').value;
+
+    this.taskService.updateTask(this.editKey, this.formTask);
+    this.isEditing = false
   }
 
   // on Hierachy mode changes
@@ -379,7 +462,7 @@ export class TableComponent implements OnInit {
 
   public addTask(): any {
     this.task = {
-      id: '91858fa0-fafe-4871-ad8c-6ff9fa9947ff',
+      id: '63858fa0-fafe-4871-ad8c-6ff9fa9947ff',
       taskName: 'Paren task 3',
       resourceCount: 10,
       team: 'Test team',

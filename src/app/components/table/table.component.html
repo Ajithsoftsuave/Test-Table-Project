@@ -19,3 +19,66 @@
 
     </ejs-treegrid>
 </div>
+
+<div *ngIf = 'isEditing' class="popup-background">
+    <div class="popup-box">
+        <div class="popup-head">
+            <p>Update Record for: {{ this.formTask.id }}</p>
+            <br />
+            <i (click)="isEditing = false" class="material-icons">close</i>
+        </div>
+        <div class="popup-content" [formGroup]="taskForm">
+            <div class="form-item">
+                <label>Task Name:</label>
+                <input
+                    formControlName="taskName"
+                    type="text"
+                />
+            </div>
+            <div class="form-item">
+                <label>Resource Count</label>
+                <input
+                    formControlName="resourceCount"
+                    type="number"
+                />
+            </div>
+            <div class="form-item">
+                <label>Progress</label>
+                <input
+                    formControlName="progress"
+                    type="number"
+                />
+            </div>
+            <div class="form-item">
+                <label>Duration</label>
+                <input
+                    formControlName="duration"
+                    type="number"
+                />
+            </div>
+            <div class="form-item">
+                <label>Priority</label>
+                <input
+                    formControlName="priority"
+                    type="text"
+                />
+            </div>
+            <div class="form-item">
+                <label>Approved</label>
+                <select formControlName="approved">
+                    <option [ngValue]="null" name="select">
+                        Select
+                    </option>
+                    <option [ngValue]=true name="true">True</option>
+                    <option [ngValue]=false name="false">False</option>
+                </select>
+            </div>
+        </div>
+        <div class="popup-actions">
+            <button class="submit-button" (click)="onFormSubmit()">
+                Update Record
+            </button>
+        </div>
+    </div>
+
+</div>

@@ -16,6 +16,7 @@ import { ResizeService } from '@syncfusion/ej2-angular-treegrid';
 import { environment } from 'src/environments/environment';
 import {SortService } from '@syncfusion/ej2-angular-treegrid';
 import {FilterService} from '@syncfusion/ej2-angular-treegrid';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -33,6 +34,8 @@ import {FilterService} from '@syncfusion/ej2-angular-treegrid';
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireDatabaseModule,
     AngularFireStorageModule,
+    FormsModule,
+    ReactiveFormsModule
   ],
   providers: [
     ReorderService,

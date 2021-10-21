@@ -2,3 +2,112 @@
     text-align: center;
     color:orchid;
 }
+.popup-box {
+    width: 40%;
+}
+.popup-background {
+    z-index: 999;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba($color: #ffff, $alpha: 0.5);
+    .popup-box {
+        background-color: white;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        padding: 1.375rem 1.5625rem;
+        max-height: 90vh;
+        max-width: 40vw;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        .popup-content {
+            flex: 1 1 auto;
+            overflow: auto;
+            max-height: 350px;
+            img {
+                max-width: 60%;
+            }
+        }
+        .popup-head {
+            display: flex;
+            justify-content: space-between;
+            flex: 0 0 auto;
+            align-items: center;
+            border-bottom: 1px solid #cbd2d9;
+            margin-bottom: 15px;
+            p {
+                font-size: 20px;
+            }
+            .material-icons {
+                color: #a8a7a7;
+                cursor: pointer;
+                margin-left: 8px;
+            }
+        }
+        .popup-actions {
+            flex: 0 0 auto;
+            background: #e8f0fa;
+            margin-top: 15px;
+            display: flex;
+            justify-content: flex-end;
+            padding: 10px;
+            flex-wrap: wrap;
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+            border-top: 1px solid #cbd2d9;
+            p {
+                border-radius: 17px;
+                padding: 5px 24px;
+                cursor: pointer;
+                font-weight: 400;
+                border: 1px solid #05386c;
+                color: #05386c;
+                margin-right: 12px;
+                &:hover,
+                &.selected {
+                    color: #fff;
+                    background: #05386c;
+                }
+                &.disabled {
+                    color: grey;
+                    background: #eee;
+                    border: 1px solid #eee;
+                }
+            }
+        }
+    }
+}
+
+.form-item {
+    margin-top: 12px;
+    label {
+        font-size: 16px;
+        color: #010101;
+        font-weight: 400;
+        display: block;
+        margin-bottom: 12px;
+        span.red {
+            color: red;
+        }
+    }
+    input,
+    select,
+    textarea {
+        font-family: inherit;
+        padding: 12px 20px;
+        border: 1px solid #cbd2d9;
+        border-radius: 3px;
+        width: 90%;
+        display: block;
+        background: #fff;
+    }
+    &:first-child {
+        margin-top: 0;
+    }
+}
