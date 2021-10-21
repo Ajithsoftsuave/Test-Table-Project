@@ -298,8 +298,14 @@ export class TableComponent implements OnInit {
     // this.treegrid.columns.push(columnName); // Insert Columns
       this.treegrid.refreshColumns(); // Refresh Columns
     } else if (args.item.id === 'deleteColumn') {
-      const columnName = 2;
-      this.treegrid.columns.splice(columnName, 1); // Splice columns
+      let columnIndex;
+      this.treegrid.columns.forEach((col, index) => {
+        if ( col.field === this.activeContextMenuColumn.field ) {
+          columnIndex = index;
+        }
+      });
+
+      this.treegrid.columns.splice(columnIndex, 1); // Splice columns
       this.treegrid.refreshColumns(); // Refresh Columns
     } else if (args.item.id === 'rename') {
       const data = args.column.field;
