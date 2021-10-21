@@ -108,8 +108,8 @@ export class TableComponent implements OnInit {
           { text: 'Default-Value', id: 'defaultvalue' },
           { text: 'Minimum-Column-Width', id: 'minwidth' },
           { text: 'Font-size', id: 'fontsize' },
-          { text: 'Font-color', id: 'fontcolor' },
-          { text: 'Background-color', id: 'bgcolr' },
+          { text: 'Font-color', id: 'fontcolor', items: [ { text: 'white', id: 'cl-white' }, { text: 'black', id: 'bg-black' }]},
+          { text: 'Background-color', id: 'bgcolr' , items: [ { text: 'red', id: 'bg-red' }, { text: 'blue', id: 'bg-blue' }, { text: 'white', id: 'bg-white' }] },
           { text: 'Alignment', id: 'alignment' , items: [ { text: 'Right', id: 'al-right' }, { text: 'Left', id: 'al-left' }, { text: 'Center', id: 'al-center' }, { text: 'Justify', id: 'al-justify' }] },
           { text: 'Text-wrap', id: 'textwrap' , items: [ { text: 'Clip', id: 'tw-clip' }, { text: 'EllipsisWithTooltip', id: 'tw-ellipsis-tooltip' }, { text: 'Ellipsis', id: 'tw-ellipsis' }] },
         ],
@@ -310,6 +310,23 @@ export class TableComponent implements OnInit {
     }else if (args.item.id === 'tw-clip' || args.item.id === 'tw-ellipsis-tooltip' || args.item.id === 'tw-ellipsis') {
         this.treegrid.getColumnByField(this.activeContextMenuColumn.field).clipMode = args.item.text;
         this.treegrid.refreshColumns();
+    }else if (args.item.id === 'bg-red' || args.item.id === 'bg-blue' ||  args.item.id === 'bg-white' ) {
+       let bgindex = -1;
+       // @ts-ignore
+       this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.forEach((a, index) => {
+         if (a.includes('bg')) {
+           bgindex = index;
+         }
+       });
+
+       if (bgindex !== -1) {
+         // @ts-ignore
+         this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.splice(bgindex, 1);
+       }
+
+      // @ts-ignore
+       this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.push(args.item.id);
+       this.treegrid.refreshColumns();
     }
   }
 
@@ -451,7 +468,7 @@ export class TableComponent implements OnInit {
     this.formTask.approved = this.taskForm.get('approved').value;
 
     this.taskService.updateTask(this.editKey, this.formTask);
-    this.isEditing = false
+    this.isEditing = false;
   }
 
   // on Hierachy mode changes

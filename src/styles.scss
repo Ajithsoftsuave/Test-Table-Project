@@ -11,3 +11,28 @@
 @import '../node_modules/@syncfusion/ej2-treegrid/styles/material.css';
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+
+th.e-headercell.bg-red {
+  background-color: red;
+}
+
+th.e-headercell.bg-blue {
+  background-color: #8e8ec7;
+}
+
+th.e-headercell.bg-white {
+  background-color: white;
+}
+
+//
+
+td.e-rowcell.bg-red {
+  background-color: red;
+}
+td.e-rowcell.bg-blue {
+  background-color: #8e8ec7;
+}
+td.e-rowcell.bg-white {
+  background-color: white;
+}
