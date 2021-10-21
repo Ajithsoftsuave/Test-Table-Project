@@ -282,12 +282,14 @@ export class TableComponent implements OnInit {
       const treegridtreegridcompJSON = JSON.parse(treegridtreegridcomp);
 
       if (treegridtreegridcomp) {
-       treegridtreegridcompJSON.columns.map((column, index) => {
+       treegridtreegridcompJSON.columns.forEach((column, index, arr) => {
           if (column && column.field === this.activeContextMenuColumn.field ) {
-            this.freezeIndex = index + 1;
+            if ( index + 1 !== arr.length) {
+              this.freezeIndex = index + 1;
+            }
           }
         });
-      }
+    }
 
     }else if (args.item.id === 'insert') {
       const columnName = { field: 'data', width: 100 };
