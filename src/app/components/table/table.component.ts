@@ -106,7 +106,8 @@ export class TableComponent implements OnInit {
         items: [
           { text: 'Data-Type', id: 'datatype' },
           { text: 'Default-Value', id: 'defaultvalue' },
-          { text: 'Minimum-Column-Width', id: 'minwidth' },
+          // tslint:disable-next-line:max-line-length
+          { text: 'Minimum-Column-Width', id: 'minwidth' , items: [ { text: 'No', id: 'min-width-no' , wid: 0}, { text: 'Yes (Default: 100)', id: 'min-width-yes' , wid: 100} ] },
           { text: 'Font-size', id: 'fontsize' , items: [ { text: '10px', id: 'fs-10' }, { text: '13px', id: 'fs-13' }, { text: '20px', id: 'fs-20' }] },
           { text: 'Font-color', id: 'fontcolor', items: [ { text: 'white', id: 'cl-white' }, { text: 'black', id: 'cl-black' }]},
           { text: 'Background-color', id: 'bgcolr' , items: [ { text: 'red', id: 'bg-red' }, { text: 'blue', id: 'bg-blue' }, { text: 'white', id: 'bg-white' }] },
@@ -304,6 +305,9 @@ export class TableComponent implements OnInit {
       const data = args.column.field;
       this.treegrid.getColumnByField(data).headerText = 'Task details'; // Rename column name
       this.treegrid.refreshColumns(); // Refresh Columns
+    } else if (args.item.id === 'min-width-no' || args.item.id === 'min-width-yes') {
+      this.treegrid.getColumnByField(this.activeContextMenuColumn.field).minWidth = args.item.wid;
+      this.treegrid.refreshColumns();
     } else if (args.item.id === 'al-right' || args.item.id === 'al-left' || args.item.id === 'al-center' || args.item.id === 'al-justify') {
         this.treegrid.getColumnByField(this.activeContextMenuColumn.field).textAlign = args.item.text;
         this.treegrid.refreshColumns();
