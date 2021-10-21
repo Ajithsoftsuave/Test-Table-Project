@@ -85,7 +85,8 @@ export class TableComponent implements OnInit {
       'Edit',
       { text: 'Copy', target: '.e-content', id: 'copy' },
       { text: 'Cut', target: '.e-content', id: 'cut' },
-      { text: 'Paste', target: '.e-content', id: 'paste' },
+      { text: 'Paste Next', target: '.e-content', id: 'pastenext' },
+      { text: 'Paste Child', target: '.e-content', id: 'pastechild' },
       {
         text: 'Style',
         target: '.e-gridheader',
@@ -192,6 +193,7 @@ export class TableComponent implements OnInit {
     return null;
   }
 
+  // tslint:disable-next-line: use-lifecycle-interface
   ngAfterViewInit(): void {
     this.treegridColumns = [
       {
@@ -250,8 +252,10 @@ export class TableComponent implements OnInit {
     } else if (args.item.id === 'copy' && args.item.target === '.e-content') {
       this.copiedTasks = [];
       this.copiedTasks.push(this.getItemById(args.rowInfo.rowData.taskData.id));
-    } else if (args.item.id === 'paste' && args.item.target === '.e-content') {
-      this.pasteRecords(this.copiedTasks);
+    } else if (args.item.id === 'pastenext' && args.item.target === '.e-content') {
+      this.pasteNextRecords(this.copiedTasks);
+    } else if (args.item.id === 'pastechild' && args.item.target === '.e-content') {
+      this.pasteChildRecords(this.copiedTasks, args.rowInfo.rowData.taskData.id, args.rowInfo.rowData.taskData.key);
     } else if (args.item.text === 'Edit Record') {
       this.editRecord(args);
     } else if (args.item.id === 'freeze') {
@@ -266,7 +270,7 @@ export class TableComponent implements OnInit {
         });
       }*/
     } else if (args.item.id === 'insert') {
-      let columnName = { field: 'data', width: 100 };
+      const columnName = { field: 'data', width: 100 };
       // this.treegrid.columns.push(columnName); // Insert Columns
       this.treegrid.refreshColumns(); // Refresh Columns
     } else if (args.item.id === 'deleteColumn') {
@@ -343,10 +347,46 @@ export class TableComponent implements OnInit {
     const index = data.index;
   }
 
-  pasteRecords(tasks: any): void {
+  pasteNextRecords(tasks: any): void {
     for (const task of tasks) {
+      task.id = uuidv4();
       this.taskService.createTask(task);
     }
+  }
+
+  pasteChildRecords(tasks: any, parentTaskId: string, key: string): void {
+    for (const task of tasks) {
+      if (task.id === parentTaskId){
+        alert('can not paste same task as child task to itsekf');
+        return;
+      }
+      task.isSubtask = true;
+      task.id = uuidv4();
+      this.taskService.createTask(task);
+    }
+    const recordToUpdate: Task = this.getItemById(
+      parentTaskId
+    );
+    if (recordToUpdate.subtasks) {
+      for (let index = 0; index < recordToUpdate.subtasks.length; index++) {
+        recordToUpdate.subtasks[index] = recordToUpdate.subtasks[index].id;
+      }
+      for (const task of tasks){
+        recordToUpdate.subtasks.push(task.id);
+      }
+    } else {
+      for (let index = 0; index < tasks.length; index++){
+        if (index === 0) {
+          recordToUpdate.subtasks = [(tasks[index].id)];
+        } else {
+          recordToUpdate.subtasks.push(tasks[index].id);
+        }
+      }
+    }
+    this.taskService.updateTask(
+      key,
+      recordToUpdate
+    );
   }
 
   // on Hierachy mode changes
@@ -357,7 +397,7 @@ export class TableComponent implements OnInit {
 
   public addTask(): any {
     this.task = {
-      id: '91858fa0-fafe-4871-ad8c-6ff9fa9947ff',
+      id: '63858fa0-fafe-4871-ad8c-6ff9fa9947ff',
       taskName: 'Paren task 3',
       resourceCount: 10,
       team: 'Test team',
