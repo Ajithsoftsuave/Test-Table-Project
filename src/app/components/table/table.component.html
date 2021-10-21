@@ -3,7 +3,7 @@
 <div style="padding-top: 7px; float:left">Hierarchy Mode</div><div style="padding-left: 10px; display: inline-block"><ejs-dropdownlist (change)='onChange($event)' [dataSource]='dropData' value='Parent' [fields]='fields'></ejs-dropdownlist></div>
 <div class="control-section" *ngIf='tableData !== [] && tableData[0]'>
 
-  <ejs-treegrid #treegrid [dataSource]='tableData'  allowReordering="true" [enableHover]='false' childMapping='subtasks' [treeColumnIndex]='1' id="treegridcomp" [pageSettings]='pageSettings' allowFiltering='true' allowExcelExport='true' allowPdfExport='true' allowSorting='true'  [allowResizing]=true [allowSelection]='true' [selectionSettings]='selectionOptions'
+  <ejs-treegrid #treegrid [dataSource]='tableData' [enablePersistence]="true"  allowReordering="true" [enableHover]='false' childMapping='subtasks' [treeColumnIndex]='1' id="treegridcomp" [pageSettings]='pageSettings' allowFiltering='true' allowExcelExport='true' allowPdfExport='true' allowSorting='true'  [allowResizing]=true [allowSelection]='true' [selectionSettings]='selectionOptions'
               [frozenColumns]="freezeIndex" [contextMenuItems]="contextMenuItems" [editSettings]='editing' [toolbar]="toolbar" (contextMenuOpen)="openContextMenu($event)" (contextMenuClick)='contextMenuClick($event)' [showColumnChooser]="true">
         <e-columns>
             <e-column [customAttributes]="{ class: []}" field="" type='checkbox' width='50' [showInColumnChooser]="false"></e-column>
