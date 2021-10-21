@@ -115,9 +115,6 @@ export class TableComponent implements OnInit {
           { text: 'Text-wrap', id: 'textwrap' , items: [ { text: 'Clip', id: 'tw-clip' }, { text: 'EllipsisWithTooltip', id: 'tw-ellipsis-tooltip' }, { text: 'Ellipsis', id: 'tw-ellipsis' }] },
         ],
       },
-      { text: 'New', target: '.e-headercell', id: 'new' },
-      { text: 'Delete', target: '.e-headercell', id: 'delete' },
-      { text: 'Edit', target: '.e-headercell', id: 'edit' },
       { text: 'Freeze', target: '.e-headercell', id: 'freeze' },
       { text: 'Filter', target: '.e-headercell', id: 'paste' },
       { text: 'Multisort', target: '.e-headercell', id: 'paste' },
@@ -129,7 +126,7 @@ export class TableComponent implements OnInit {
       'NextPage',
       { text: 'Insert Column', target: '.e-headercontent', id: 'insert' },
       { text: 'Delete Column', target: '.e-headercontent', id: 'deleteColumn' },
-      { text: 'Rename Column', target: '.e-headercontent', id: 'rename' },
+      { text: 'Rename Column', target: '.e-headercontent', id: 'renameColumn' },
     ];
 
     this.editing = {
@@ -307,10 +304,10 @@ export class TableComponent implements OnInit {
 
       this.treegrid.columns.splice(columnIndex, 1); // Splice columns
       this.treegrid.refreshColumns(); // Refresh Columns
-    } else if (args.item.id === 'rename') {
-      const data = args.column.field;
+    } else if (args.item.id === 'renameColumn') {
+      const data = this.activeContextMenuColumn.field;
       this.treegrid.getColumnByField(data).headerText = 'Task details'; // Rename column name
-      this.treegrid.refreshColumns(); // Refresh Columns
+      this.treegrid.refreshColumns();
     } else if (args.item.id === 'min-width-no' || args.item.id === 'min-width-yes') {
       this.treegrid.getColumnByField(this.activeContextMenuColumn.field).minWidth = args.item.wid;
       this.treegrid.refreshColumns();
