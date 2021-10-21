@@ -111,7 +111,7 @@ export class TableComponent implements OnInit {
           { text: 'Font-color', id: 'fontcolor' },
           { text: 'Background-color', id: 'bgcolr' },
           { text: 'Alignment', id: 'alignment' , items: [ { text: 'Right', id: 'al-right' }, { text: 'Left', id: 'al-left' }, { text: 'Center', id: 'al-center' }, { text: 'Justify', id: 'al-justify' }] },
-          { text: 'Text-wrap', id: 'textwrap'},
+          { text: 'Text-wrap', id: 'textwrap' , items: [ { text: 'Clip', id: 'tw-clip' }, { text: 'EllipsisWithTooltip', id: 'tw-ellipsis-tooltip' }, { text: 'Ellipsis', id: 'tw-ellipsis' }] },
         ],
       },
       { text: 'New', target: '.e-headercell', id: 'new' },
@@ -305,8 +305,11 @@ export class TableComponent implements OnInit {
       this.treegrid.getColumnByField(data).headerText = 'Task details'; // Rename column name
       this.treegrid.refreshColumns(); // Refresh Columns
     } else if (args.item.id === 'al-right' || args.item.id === 'al-left' || args.item.id === 'al-center' || args.item.id === 'al-justify') {
-      this.treegrid.getColumnByField(this.activeContextMenuColumn.field).textAlign = args.item.text;
-      this.treegrid.refreshColumns();
+        this.treegrid.getColumnByField(this.activeContextMenuColumn.field).textAlign = args.item.text;
+        this.treegrid.refreshColumns();
+    }else if (args.item.id === 'tw-clip' || args.item.id === 'tw-ellipsis-tooltip' || args.item.id === 'tw-ellipsis') {
+        this.treegrid.getColumnByField(this.activeContextMenuColumn.field).clipMode = args.item.text;
+        this.treegrid.refreshColumns();
     }
   }
 
