@@ -1,84 +1,98 @@
-<h2 class="title" > Project Tasks List</h2>
-<button  (click)='addTask()'>Add</button>
-<div style="padding-top: 7px; float:left">Hierarchy Mode</div><div style="padding-left: 10px; display: inline-block"><ejs-dropdownlist (change)='onChange($event)' [dataSource]='dropData' value='Parent' [fields]='fields'></ejs-dropdownlist></div>
-<div class="control-section" *ngIf='tableData !== [] && tableData[0]'>
-
-  <ejs-treegrid #treegrid [dataSource]='tableData' [enablePersistence]='true' allowReordering="true" [enableHover]='false' childMapping='subtasks' [treeColumnIndex]='1' id="treegridcomp" [pageSettings]='pageSettings' allowFiltering='true' allowExcelExport='true' allowPdfExport='true' allowSorting='true'  [allowResizing]=true [allowSelection]='true' [selectionSettings]='selectionOptions'
-              [frozenColumns]="freezeIndex" [contextMenuItems]="contextMenuItems" [editSettings]='editing' [toolbar]="toolbar" (contextMenuOpen)="openContextMenu($event)" (contextMenuClick)='contextMenuClick($event)' [showColumnChooser]="true">
-        <e-columns>
-            <e-column field="" type='checkbox' width='50' [showInColumnChooser]="false"></e-column>
-            <e-column field='id' headerText='ID' isPrimaryKey='true' width='140' [edit]='editparams' textAlign='Right' editType='numericedit'></e-column>
-            <e-column field='taskName' headerText='Task Name' width='110'></e-column>
-            <e-column field='resourceCount' headerText='Resource Count' width='90'></e-column>
-            <e-column field='team' headerText='Team' width='70'></e-column>
-            <e-column field='duration' headerText='Duration' width='85'  [edit]='editparams' textAlign='Right' editType='numericedit'></e-column>
-            <e-column field='progress' headerText='Progress' width='90' textAlign='Right'  [edit]='editparams' editType='numericedit'></e-column>
-            <e-column field='priority' headerText='Priority' width='80' textAlign='Right'   editType='stringedit'></e-column>
-            <e-column field='approved' headerText='Approved' width='80' textAlign='Right'   editType='stringedit'></e-column>
-        </e-columns>
-
-    </ejs-treegrid>
+<div class="header">
+    <h4 class="title" > Project Tasks List</h4>
 </div>
-
-<div *ngIf = 'isEditing' class="popup-background">
-    <div class="popup-box">
-        <div class="popup-head">
-            <p>Update Record for: {{ this.formTask.id }}</p>
-            <br />
-            <i (click)="isEditing = false" class="material-icons">close</i>
+<div class="main_continer">
+    <div class="head">
+    <div  class="head1">Hierarchy Mode <span><button  class="btn" (click)='addTask()'>Add</button> </span></div> 
+    <div class="head2"><ejs-dropdownlist (change)='onChange($event)' [dataSource]='dropData' value='Parent' [fields]='fields'></ejs-dropdownlist></div>   
+    </div>
+    
+   
+    <div class="control-section" *ngIf='tableData !== [] && tableData[0]'>
+    
+      <ejs-treegrid #treegrid [dataSource]='tableData' [enablePersistence]='true' allowReordering="true" [enableHover]='false' childMapping='subtasks' [treeColumnIndex]='1' id="treegridcomp" [pageSettings]='pageSettings' allowFiltering='true' allowExcelExport='true' allowPdfExport='true' allowSorting='true'  [allowResizing]=true [allowSelection]='true' [selectionSettings]='selectionOptions'
+                  [frozenColumns]="freezeIndex" [contextMenuItems]="contextMenuItems" [editSettings]='editing' [toolbar]="toolbar" (contextMenuOpen)="openContextMenu($event)" (contextMenuClick)='contextMenuClick($event)' [showColumnChooser]="true">
+            <e-columns>
+                <e-column field="" type='checkbox' width='30' [showInColumnChooser]="false"></e-column>
+                <e-column field='id' headerText='ID' isPrimaryKey='true' width='140' [edit]='editparams' textAlign='Right' editType='numericedit'></e-column>
+                <e-column field='taskName' headerText='Task Name' width='110'></e-column>
+                <e-column field='resourceCount' headerText='Resource Count' width='90'></e-column>
+                <e-column field='team' headerText='Team' width='70'></e-column>
+                <e-column field='duration' headerText='Duration' width='85'  [edit]='editparams' textAlign='Right' editType='numericedit'></e-column>
+                <e-column field='progress' headerText='Progress' width='90' textAlign='Right'  [edit]='editparams' editType='numericedit'></e-column>
+                <e-column field='priority' headerText='Priority' width='80' textAlign='Right'   editType='stringedit'></e-column>
+                <e-column field='approved' headerText='Approved' width='80' textAlign='Right'   editType='stringedit'></e-column>
+            </e-columns>
+    
+        </ejs-treegrid>
+    </div>
+    
+    <div *ngIf = 'isEditing' class="popup-background">
+        <div class="popup-box">
+            <div class="popup-head">
+                <p>Update Record for: {{ this.formTask.id }}</p>
+                <br />
+                <i (click)="isEditing = false" class="material-icons">close</i>
+            </div>
+            <div class="popup-content" [formGroup]="taskForm">
+                <div class="form-item">
+                    <label>Task Name:</label>
+                    <input
+                        formControlName="taskName"
+                        type="text"
+                    />
+                </div>
+                <div class="form-item">
+                    <label>Resource Count</label>
+                    <input
+                        formControlName="resourceCount"
+                        type="number"
+                    />
+                </div>
+                <div class="form-item">
+                    <label>Progress</label>
+                    <input
+                        formControlName="progress"
+                        type="number"
+                    />
+                </div>
+                <div class="form-item">
+                    <label>Duration</label>
+                    <input
+                        formControlName="duration"
+                        type="number"
+                    />
+                </div>
+                <div class="form-item">
+                    <label>Priority</label>
+                    <input
+                        formControlName="priority"
+                        type="text"
+                    />
+                </div>
+                <div class="form-item">
+                    <label>Approved</label>
+                    <select formControlName="approved">
+                        <option [ngValue]="null" name="select">
+                            Select
+                        </option>
+                        <option [ngValue]=true name="true">True</option>
+                        <option [ngValue]=false name="false">False</option>
+                    </select>
+                </div>
+            </div>
+            <div class="popup-actions">
+                <div>
+                    <button class="submit-button" (click)="onFormSubmit()">
+                        Update Record
+                    </button>
+                </div>
+                
+            </div>
         </div>
-        <div class="popup-content" [formGroup]="taskForm">
-            <div class="form-item">
-                <label>Task Name:</label>
-                <input
-                    formControlName="taskName"
-                    type="text"
-                />
-            </div>
-            <div class="form-item">
-                <label>Resource Count</label>
-                <input
-                    formControlName="resourceCount"
-                    type="number"
-                />
-            </div>
-            <div class="form-item">
-                <label>Progress</label>
-                <input
-                    formControlName="progress"
-                    type="number"
-                />
-            </div>
-            <div class="form-item">
-                <label>Duration</label>
-                <input
-                    formControlName="duration"
-                    type="number"
-                />
-            </div>
-            <div class="form-item">
-                <label>Priority</label>
-                <input
-                    formControlName="priority"
-                    type="text"
-                />
-            </div>
-            <div class="form-item">
-                <label>Approved</label>
-                <select formControlName="approved">
-                    <option [ngValue]="null" name="select">
-                        Select
-                    </option>
-                    <option [ngValue]=true name="true">True</option>
-                    <option [ngValue]=false name="false">False</option>
-                </select>
-            </div>
-        </div>
-        <div class="popup-actions">
-            <button class="submit-button" (click)="onFormSubmit()">
-                Update Record
-            </button>
-        </div>
+    
     </div>
 
 </div>
+
+
