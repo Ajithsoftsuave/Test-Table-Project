@@ -9,4 +9,5 @@ export class Task{
     approved: boolean;
     subtasks: any[];
     isSubtask: boolean;
+    nextTaskId ?: any;
 }

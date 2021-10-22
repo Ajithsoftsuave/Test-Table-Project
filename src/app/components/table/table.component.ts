@@ -74,6 +74,7 @@ export class TableComponent implements OnInit {
   treegridColumns: Array<any> = new Array();
   taskForm: FormGroup;
   isEditing = false;
+  isCut = false;
 
   constructor(
     private fb: FormBuilder,
@@ -266,10 +267,12 @@ export class TableComponent implements OnInit {
     } else if (args.item.id === 'delete' && args.item.target === '.e-content') {
       this.taskService.deleteTask(args.rowInfo.rowData.taskData.key);
     } else if (args.item.id === 'cut' && args.item.target === '.e-content') {
+      this.isCut = true;
       this.copiedTasks = [];
       this.copiedTasks.push(this.getItemById(args.rowInfo.rowData.taskData.id));
-      this.taskService.deleteTask(args.rowInfo.rowData.taskData.key);
+      // this.taskService.deleteTask(args.rowInfo.rowData.taskData.key);
     } else if (args.item.id === 'copy' && args.item.target === '.e-content') {
+      this.isCut = false;
       this.copiedTasks = [];
       this.copiedTasks.push(this.getItemById(args.rowInfo.rowData.taskData.id));
     } else if (args.item.id === 'pastenext' && args.item.target === '.e-content') {
@@ -382,6 +385,12 @@ export class TableComponent implements OnInit {
       task.id = uuidv4();
       this.taskService.createTask(task);
     }
+    if (this.isCut){
+      for (const task of tasks) {
+        this.taskService.deleteTask(task.key);
+      }
+      this.isCut = false;
+    }
   }
 
   pasteChildRecords(tasks: any, parentTaskId: string, key: string): void {
@@ -421,6 +430,12 @@ export class TableComponent implements OnInit {
       key,
       recordToUpdate
     );
+    if (this.isCut){
+      for (const task of tasks) {
+        this.taskService.deleteTask(task.key);
+      }
+      this.isCut = false;
+    }
   }
 
   editRow(task: any, key: string): void{
@@ -448,7 +463,7 @@ export class TableComponent implements OnInit {
     this.formTask.approved = this.taskForm.get('approved').value;
 
     this.taskService.updateTask(this.editKey, this.formTask);
-    this.isEditing = false
+    this.isEditing = false;
   }
 
   // on Hierachy mode changes
