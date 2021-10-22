@@ -107,17 +107,15 @@ export class TableComponent implements OnInit {
         items: [
           { text: 'Data-Type', id: 'datatype' },
           { text: 'Default-Value', id: 'defaultvalue' },
-          { text: 'Minimum-Column-Width', id: 'minwidth' },
-          { text: 'Font-size', id: 'fontsize' },
-          { text: 'Font-color', id: 'fontcolor' },
-          { text: 'Background-color', id: 'bgcolr' },
+          // tslint:disable-next-line:max-line-length
+          { text: 'Minimum-Column-Width', id: 'minwidth' , items: [ { text: 'No', id: 'min-width-no' , wid: 0}, { text: 'Yes (Default: 100)', id: 'min-width-yes' , wid: 100} ] },
+          { text: 'Font-size', id: 'fontsize' , items: [ { text: '10px', id: 'fs-10' }, { text: '13px', id: 'fs-13' }, { text: '20px', id: 'fs-20' }] },
+          { text: 'Font-color', id: 'fontcolor', items: [ { text: 'white', id: 'cl-white' }, { text: 'black', id: 'cl-black' }]},
+          { text: 'Background-color', id: 'bgcolr' , items: [ { text: 'red', id: 'bg-red' }, { text: 'blue', id: 'bg-blue' }, { text: 'white', id: 'bg-white' }] },
           { text: 'Alignment', id: 'alignment' , items: [ { text: 'Right', id: 'al-right' }, { text: 'Left', id: 'al-left' }, { text: 'Center', id: 'al-center' }, { text: 'Justify', id: 'al-justify' }] },
-          { text: 'Text-wrap', id: 'textwrap'},
+          { text: 'Text-wrap', id: 'textwrap' , items: [ { text: 'Clip', id: 'tw-clip' }, { text: 'EllipsisWithTooltip', id: 'tw-ellipsis-tooltip' }, { text: 'Ellipsis', id: 'tw-ellipsis' }] },
         ],
       },
-      { text: 'New', target: '.e-headercell', id: 'new' },
-      { text: 'Delete', target: '.e-headercell', id: 'delete' },
-      { text: 'Edit', target: '.e-headercell', id: 'edit' },
       { text: 'Freeze', target: '.e-headercell', id: 'freeze' },
       { text: 'Filter', target: '.e-headercell', id: 'paste' },
       { text: 'Multisort', target: '.e-headercell', id: 'paste' },
@@ -129,7 +127,7 @@ export class TableComponent implements OnInit {
       'NextPage',
       { text: 'Insert Column', target: '.e-headercontent', id: 'insert' },
       { text: 'Delete Column', target: '.e-headercontent', id: 'deleteColumn' },
-      { text: 'Rename Column', target: '.e-headercontent', id: 'rename' },
+      { text: 'Rename Column', target: '.e-headercontent', id: 'renameColumn' },
     ];
 
     this.editing = {
@@ -300,15 +298,78 @@ export class TableComponent implements OnInit {
     // this.treegrid.columns.push(columnName); // Insert Columns
       this.treegrid.refreshColumns(); // Refresh Columns
     } else if (args.item.id === 'deleteColumn') {
-      const columnName = 2;
-      this.treegrid.columns.splice(columnName, 1); // Splice columns
+      let columnIndex;
+      this.treegrid.columns.forEach((col, index) => {
+        if ( col.field === this.activeContextMenuColumn.field ) {
+          columnIndex = index;
+        }
+      });
+
+      this.treegrid.columns.splice(columnIndex, 1); // Splice columns
       this.treegrid.refreshColumns(); // Refresh Columns
-    } else if (args.item.id === 'rename') {
-      const data = args.column.field;
+    } else if (args.item.id === 'renameColumn') {
+      const data = this.activeContextMenuColumn.field;
       this.treegrid.getColumnByField(data).headerText = 'Task details'; // Rename column name
-      this.treegrid.refreshColumns(); // Refresh Columns
+      this.treegrid.refreshColumns();
+    } else if (args.item.id === 'min-width-no' || args.item.id === 'min-width-yes') {
+      this.treegrid.getColumnByField(this.activeContextMenuColumn.field).minWidth = args.item.wid;
+      this.treegrid.refreshColumns();
     } else if (args.item.id === 'al-right' || args.item.id === 'al-left' || args.item.id === 'al-center' || args.item.id === 'al-justify') {
-      this.treegrid.getColumnByField(this.activeContextMenuColumn.field).textAlign = args.item.text;
+        this.treegrid.getColumnByField(this.activeContextMenuColumn.field).textAlign = args.item.text;
+        this.treegrid.refreshColumns();
+    }else if (args.item.id === 'tw-clip' || args.item.id === 'tw-ellipsis-tooltip' || args.item.id === 'tw-ellipsis') {
+        this.treegrid.getColumnByField(this.activeContextMenuColumn.field).clipMode = args.item.text;
+        this.treegrid.refreshColumns();
+    }else if (args.item.id === 'bg-red' || args.item.id === 'bg-blue' ||  args.item.id === 'bg-white' ) {
+       let bgindex = -1;
+       // @ts-ignore
+       this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.forEach((a, index) => {
+         if (a.includes('bg')) {
+           bgindex = index;
+         }
+       });
+
+       if (bgindex !== -1) {
+         // @ts-ignore
+         this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.splice(bgindex, 1);
+       }
+
+      // @ts-ignore
+       this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.push(args.item.id);
+       this.treegrid.refreshColumns();
+    }else if (args.item.id === 'cl-white' || args.item.id === 'cl-black' ) {
+      let clindex = -1;
+      // @ts-ignore
+      this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.forEach((a, index) => {
+        if (a.includes('cl')) {
+          clindex = index;
+        }
+      });
+
+      if (clindex !== -1) {
+        // @ts-ignore
+        this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.splice(clindex, 1);
+      }
+
+      // @ts-ignore
+      this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.push(args.item.id);
+      this.treegrid.refreshColumns();
+    }else if (args.item.id === 'fs-10' || args.item.id === 'fs-13' || args.item.id === 'fs-20' ) {
+      let fsindex = -1;
+      // @ts-ignore
+      this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.forEach((a, index) => {
+        if (a.includes('fs')) {
+          fsindex = index;
+        }
+      });
+
+      if (fsindex !== -1) {
+        // @ts-ignore
+        this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.splice(fsindex, 1);
+      }
+
+      // @ts-ignore
+      this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.push(args.item.id);
       this.treegrid.refreshColumns();
     }
   }
