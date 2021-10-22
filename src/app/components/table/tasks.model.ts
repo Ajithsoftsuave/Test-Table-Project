@@ -1,4 +1,5 @@
 export class Task{
+    key ?: any;
     id: string;
     taskName: string;
     resourceCount: number;
@@ -9,5 +10,5 @@ export class Task{
     approved: boolean;
     subtasks: any[];
     isSubtask: boolean;
-    nextTaskId ?: any;
+    sortId ?: number;
 }

@@ -75,6 +75,7 @@ export class TableComponent implements OnInit {
   taskForm: FormGroup;
   isEditing = false;
   isCut = false;
+  parentTasks: Task[];
 
   constructor(
     private fb: FormBuilder,
@@ -162,6 +163,17 @@ export class TableComponent implements OnInit {
         }
       }
     }
+    this.tableData = this.tableData.sort((prevRecord, nextRecord): any => {
+      if (prevRecord.sortId > nextRecord.sortId) {
+        return 1;
+      }
+
+      if (prevRecord.sortId < nextRecord.sortId) {
+        return -1;
+      }
+
+      return 0;
+    });
   }
 
   // append subtasks
@@ -202,10 +214,10 @@ export class TableComponent implements OnInit {
     return null;
   }
 
-  getIndexById(id: string): number {
+  getIndexById(id: string, data: Task[]): number {
     // tslint:disable-next-line: prefer-for-of
-    for (let index = 0; index < this.responseData.length; index++) {
-      if (id === this.responseData[index].id) {
+    for (let index = 0; index < data.length; index++) {
+      if (id === data[index].id) {
         return index;
       }
     }
@@ -274,7 +286,7 @@ export class TableComponent implements OnInit {
       this.copiedTasks = [];
       this.copiedTasks.push(this.getItemById(args.rowInfo.rowData.taskData.id));
     } else if (args.item.id === 'pastenext' && args.item.target === '.e-content') {
-      this.pasteNextRecords(this.copiedTasks);
+      this.pasteNextRecords(this.copiedTasks, args);
     } else if (args.item.id === 'pastechild' && args.item.target === '.e-content') {
       this.pasteChildRecords(this.copiedTasks, args.rowInfo.rowData.taskData.id, args.rowInfo.rowData.taskData.key);
     } else if (args.item.id === 'edit' && args.item.target === '.e-content') {
@@ -375,9 +387,10 @@ export class TableComponent implements OnInit {
   }
 
   addnext(data: any): void {
+    const newRecordId = uuidv4();
     this.childRow = {
-      id: uuidv4(),
-      taskName: null,
+      id: newRecordId,
+      taskName: 'New Record',
       resourceCount: null,
       team: null,
       progress: null,
@@ -387,19 +400,39 @@ export class TableComponent implements OnInit {
       isSubtask: null,
       subtasks: null,
     };
-    this.responseData.splice(
-      this.getIndexById(data.rowInfo.rowData.taskData.id) + 1,
-      0,
-      this.childRow
-    );
-    this.taskService.createTask(this.childRow);
+    if (data.rowInfo.rowData.taskData.isSubtask){
+      this.childRow.isSubtask = true;
+      let recordToUpdate: Task;
+      for (const task of this.responseData){
+        if (task.subtasks){
+          for (let index = 0; index < task.subtasks.length; index++){
+            task.subtasks[index] = task.subtasks[index].id;
+          }
+          if (task.subtasks[0] && task.subtasks.includes(data.rowInfo.rowData.taskData.id)){
+          task.subtasks.splice(task.subtasks.indexOf(data.rowInfo.rowData.taskData.id) + 1, 0, newRecordId);
+          recordToUpdate = task;
+        }}
+      }
+      this.taskService.createTask(this.childRow);
+      this.taskService.updateTask(recordToUpdate.key , recordToUpdate);
+
+    } else{
+      this.childRow.isSubtask = false;
+      const prevIndex = this.getIndexById(data.rowInfo.rowData.taskData.id , this.tableData);
+      if (prevIndex !== this.tableData.length - 1){
+      this.childRow.sortId = (this.tableData[prevIndex].sortId + this.tableData[prevIndex + 1].sortId) / 2;
+      } else {
+      this.childRow.sortId = this.tableData[prevIndex].sortId + 1;
+      }
+      this.taskService.createTask(this.childRow);
+    }
   }
 
   addchild(args: any): void {
     const newRecordId = uuidv4();
     this.childRow = {
       id: newRecordId,
-      taskName: null,
+      taskName: 'New Record',
       resourceCount: null,
       team: null,
       progress: null,
@@ -437,14 +470,40 @@ export class TableComponent implements OnInit {
     const index = data.index;
   }
 
-  pasteNextRecords(tasks: any): void {
+  pasteNextRecords(tasks: any, data): void {
     if (!tasks){
       alert('No copied value');
       return;
     }
-    for (const task of tasks) {
-      task.id = uuidv4();
-      this.taskService.createTask(task);
+    const newRecordId = uuidv4();
+    this.childRow = tasks[0];
+    if (data.rowInfo.rowData.taskData.isSubtask){
+      this.childRow.isSubtask = true;
+      let recordToUpdate: Task;
+      for (const task of this.responseData){
+        if (task.subtasks){
+          for (let index = 0; index < task.subtasks.length; index++){
+            task.subtasks[index] = task.subtasks[index].id;
+          }
+          if (task.subtasks[0] && task.subtasks.includes(data.rowInfo.rowData.taskData.id)){
+          task.subtasks.splice(task.subtasks.indexOf(data.rowInfo.rowData.taskData.id) + 1, 0, newRecordId);
+          recordToUpdate = task;
+        }}
+      }
+      this.childRow.id = newRecordId;
+      this.taskService.createTask(this.childRow);
+      this.taskService.updateTask(recordToUpdate.key , recordToUpdate);
+
+    } else{
+      this.childRow.isSubtask = false;
+      const prevIndex = this.getIndexById(data.rowInfo.rowData.taskData.id , this.tableData);
+      if (prevIndex !== this.tableData.length - 1){
+      this.childRow.sortId = (this.tableData[prevIndex].sortId + this.tableData[prevIndex + 1].sortId) / 2;
+      } else {
+      this.childRow.sortId = this.tableData[prevIndex].sortId + 1;
+      }
+      this.childRow.id = newRecordId;
+      this.taskService.createTask(this.childRow);
     }
     if (this.isCut){
       for (const task of tasks) {
@@ -513,6 +572,11 @@ export class TableComponent implements OnInit {
       priority: [task.priority],
       approved: [task.approved],
     });
+    if (this.formTask.subtasks){
+      for (let index = 0; index < this.formTask.subtasks.length; index++){
+        this.formTask.subtasks[index] = this.formTask.subtasks[index].id;
+      }
+    }
   }
 
   onFormSubmit(): void{
@@ -535,8 +599,8 @@ export class TableComponent implements OnInit {
 
   public addTask(): any {
     this.task = {
-      id: '63858fa0-fafe-4871-ad8c-6ff9fa9947ff',
-      taskName: 'Paren task 3',
+      id: uuidv4(),
+      taskName: 'Parent task3',
       resourceCount: 10,
       team: 'Test team',
       duration: 5,
@@ -545,6 +609,7 @@ export class TableComponent implements OnInit {
       approved: false,
       isSubtask: false,
       subtasks: null,
+      sortId: 3
     };
 
     this.taskService.createTask(this.task);
