@@ -10,8 +10,13 @@
 @import '../node_modules/@syncfusion/ej2-grids/styles/material.css';
 @import '../node_modules/@syncfusion/ej2-treegrid/styles/material.css';
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
-
+body {
+    width: 100vw;
+    height: 100vh; 
+    margin: 0; 
+    font-family: Roboto, "Helvetica Neue", sans-serif; 
+    overflow: hidden;
+    }
 /*
 th.e-filterbarcell.bg-red {
   background-color: red;
