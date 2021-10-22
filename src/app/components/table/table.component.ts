@@ -600,7 +600,7 @@ export class TableComponent implements OnInit {
   public addTask(): any {
     this.task = {
       id: uuidv4(),
-      taskName: 'Parent task3',
+      taskName: 'Parent task',
       resourceCount: 10,
       team: 'Test team',
       duration: 5,
