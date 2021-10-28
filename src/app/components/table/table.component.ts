@@ -343,7 +343,8 @@ export class TableComponent implements OnInit {
       this.treegrid.refreshColumns(); // Refresh Columns
     } else if (args.item.id === 'renameColumn') {
       const data = this.activeContextMenuColumn.field;
-      this.treegrid.getColumnByField(data).headerText = 'Task details'; // Rename column name
+      let headerTxt = prompt('Enter the header name');
+      this.treegrid.getColumnByField(data).headerText = headerTxt;
       this.treegrid.refreshColumns();
     } else if (args.item.id === 'min-width-no' || args.item.id === 'min-width-yes') {
       this.treegrid.getColumnByField(this.activeContextMenuColumn.field).minWidth = args.item.wid;
