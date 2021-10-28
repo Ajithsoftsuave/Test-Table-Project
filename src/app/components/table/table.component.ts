@@ -628,6 +628,12 @@ export class TableComponent implements OnInit, TableActions{
   }
 
   public addTask(): any {
+    let sortId = 1;
+    if (this.tableData.length > 0){
+      sortId = this.tableData[this.tableData.length - 1].sortId + 1;
+    } else {
+      sortId = 1;
+    }
     this.task = {
       id: uuidv4(),
       taskName: 'New Parent task',
@@ -639,7 +645,7 @@ export class TableComponent implements OnInit, TableActions{
       approved: null,
       isSubtask: null,
       subtasks: null,
-      sortId: this.tableData[this.tableData.length - 1].sortId + 1
+      sortId
     };
 
     this.taskService.createTask(this.task);
