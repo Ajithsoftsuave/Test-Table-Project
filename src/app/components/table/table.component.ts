@@ -7,20 +7,16 @@ import {
   ContextMenuService,
   TreeGridComponent, ColumnChooserService, ToolbarService, Column,
 } from '@syncfusion/ej2-angular-treegrid';
-import { EditSettingsModel, ToolbarItems } from '@syncfusion/ej2-treegrid';
-import { MenuEventArgs } from '@syncfusion/ej2-navigations';
+import { EditSettingsModel } from '@syncfusion/ej2-treegrid';
 import { ClipboardService } from 'ngx-clipboard';
 import { SelectionSettingsModel } from '@syncfusion/ej2-angular-treegrid';
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
-import { AngularFireDatabaseModule } from '@angular/fire/database';
-import { Task } from './tasks.model';
+import { TableActions, Task } from './tasks.model';
 import { TaskService } from './task.service';
-import { AngularFireDatabase, AngularFireList } from '@angular/fire/database';
-import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { AngularFireDatabase } from '@angular/fire/database';
 import { v4 as uuidv4 } from 'uuid';
-import { element } from 'protractor';
-import { FormBuilder, FormGroup, Validator } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
+
 
 @Component({
   selector: 'app-table',
@@ -36,7 +32,7 @@ import { FormBuilder, FormGroup, Validator } from '@angular/forms';
     ColumnChooserService
   ],
 })
-export class TableComponent implements OnInit {
+export class TableComponent implements OnInit, TableActions{
   // tslint:disable-next-line: ban-types
   public responseData: Task[];
   public tableData: Task[] = [];
@@ -121,7 +117,6 @@ export class TableComponent implements OnInit {
         ],
       },
       { text: 'Freeze', target: '.e-headercell', id: 'freeze' },
-      { text: 'Filter', target: '.e-headercell', id: 'paste' },
       { text: 'Multisort', target: '.e-headercell', id: 'paste' },
       'Save',
       'Cancel',
@@ -217,7 +212,7 @@ export class TableComponent implements OnInit {
     return null;
   }
 
-  getIndexById(id: string, data: Task[]): number {
+  public getIndexById(id: string, data: Task[]): number {
     // tslint:disable-next-line: prefer-for-of
     for (let index = 0; index < data.length; index++) {
       if (id === data[index].id) {
@@ -228,7 +223,7 @@ export class TableComponent implements OnInit {
   }
 
   // tslint:disable-next-line: use-lifecycle-interface
-  ngAfterViewInit(): void {
+  public ngAfterViewInit(): void {
     this.treegridColumns = [
       {
         field: 'id',
@@ -272,7 +267,7 @@ export class TableComponent implements OnInit {
     ];
   }
   // while clicking options in context menu
-  contextMenuClick(args?): void {
+  public contextMenuClick(args?): void {
     if (args.item.id === 'addnext') {
       this.addnext(args);
     } else if (args.item.id === 'addchild') {
@@ -280,7 +275,7 @@ export class TableComponent implements OnInit {
     } else if (args.item.id === 'delete' && args.item.target === '.e-content') {
       if (this.multipleSelectId.length > 1) {
         for (const selectId of this.multipleSelectId) {
-          let data = this.getItemById(selectId);
+          const data = this.getItemById(selectId);
           this.taskService.deleteTask(data.key);
         }
       } else {
@@ -328,11 +323,11 @@ export class TableComponent implements OnInit {
     }
 
     }else if (args.item.id === 'insert') {
-     let headertxt =  prompt('enter column header name');
-      let c = <Column[]>
-        [  { field: 'New Column', headerText: headertxt, width: 130, format: 'yMd', textAlign: 'Right' ,allowReordering: true },
-        ];
-      for( let i: number = 0; i < c.length; i++ ) {
+     const headertxt =  prompt('enter column header name');
+     const c = [  { field: 'New Column', headerText: headertxt, width: 130, format: 'yMd', textAlign: 'Right' , allowReordering: true },
+        ] as Column[];
+      // tslint:disable-next-line: prefer-for-of
+     for ( let i = 0; i < c.length; i++ ) {
         (this.treegrid.columns as Column[]).push(c[i]);
         this.treegrid.refreshColumns();
       }
@@ -348,7 +343,7 @@ export class TableComponent implements OnInit {
       this.treegrid.refreshColumns(); // Refresh Columns
     } else if (args.item.id === 'renameColumn') {
       const data = this.activeContextMenuColumn.field;
-      let headerTxt = prompt('Enter the header name');
+      const headerTxt = prompt('Enter the header name');
       this.treegrid.getColumnByField(data).headerText = headerTxt;
       this.treegrid.refreshColumns();
     } else if (args.item.id === 'min-width-no' || args.item.id === 'min-width-yes') {
@@ -414,7 +409,8 @@ export class TableComponent implements OnInit {
     }
   }
 
-  addnext(data: any): void {
+  // tslint:disable-next-line: typedef
+  public addnext(data: any) {
     const newRecordId = uuidv4();
     this.childRow = {
       id: newRecordId,
@@ -456,7 +452,7 @@ export class TableComponent implements OnInit {
     }
   }
 
-  addchild(args: any): void {
+  public addchild(args: any): void {
     const newRecordId = uuidv4();
     this.childRow = {
       id: newRecordId,
@@ -487,7 +483,7 @@ export class TableComponent implements OnInit {
       recordToUpdate
     );
   }
-  editRecord(data: any): void {
+  public editRecord(data: any): void {
     this.editing = {
       allowEditing: true,
       allowAdding: true,
@@ -498,14 +494,14 @@ export class TableComponent implements OnInit {
     const index = data.index;
   }
 
-  pasteNextRecords(tasks: any, data): void {
+  public pasteNextRecords(tasks: any, data): void {
     if (!tasks){
       alert('No copied value');
       return;
     }
     const newRecordId = uuidv4();
-    if(tasks.length) {
-      for(const taskRow of tasks) {
+    if (tasks.length) {
+      for (const taskRow of tasks) {
         this.childRow = taskRow;
         if (data.rowInfo.rowData.taskData.isSubtask){
           this.childRow.isSubtask = true;
@@ -547,7 +543,7 @@ export class TableComponent implements OnInit {
 
   }
 
-  pasteChildRecords(tasks: any, parentTaskId: string, key: string): void {
+  public pasteChildRecords(tasks: any, parentTaskId: string, key: string): void {
     if (!tasks){
       alert('No copied value');
       return;
@@ -592,7 +588,7 @@ export class TableComponent implements OnInit {
     }
   }
 
-  editRow(task: any, key: string): void{
+  public editRow(task: any, key: string): void{
     this.editKey = key;
     this.formTask = task;
     this.isEditing = true;
@@ -613,7 +609,7 @@ export class TableComponent implements OnInit {
     }
   }
 
-  onFormSubmit(): void{
+  public onFormSubmit(): void{
     this.formTask.taskName = this.taskForm.get('taskName').value;
     this.formTask.resourceCount = this.taskForm.get('resourceCount').value;
     this.formTask.progress = this.taskForm.get('progress').value;
@@ -626,7 +622,7 @@ export class TableComponent implements OnInit {
   }
 
   // on Hierachy mode changes
-  onChange(e: ChangeEventArgs): any {
+  public onChange(e: ChangeEventArgs): any {
     const mode: any = e.value as string;
     this.treeGridObj.copyHierarchyMode = mode;
   }
@@ -634,25 +630,25 @@ export class TableComponent implements OnInit {
   public addTask(): any {
     this.task = {
       id: uuidv4(),
-      taskName: 'Parent task',
-      resourceCount: 10,
-      team: 'Test team',
-      duration: 5,
-      progress: 100,
-      priority: 'Normal',
-      approved: false,
-      isSubtask: false,
+      taskName: 'New Parent task',
+      resourceCount: null,
+      team: null,
+      duration: null,
+      progress: null,
+      priority: null,
+      approved: null,
+      isSubtask: null,
       subtasks: null,
-      sortId: 3
+      sortId: 1
     };
 
     this.taskService.createTask(this.task);
   }
 
-  getCheckboxData(event: any, type: string) {
+  public getCheckboxData(event: any, type: string): void {
     if (type === 'select') {
-      let selectedIndex = {indexs: [], id: []};
-      this.getChildsIndex(event.data,selectedIndex);
+      const selectedIndex = {indexs: [], id: []};
+      this.getChildsIndex(event.data, selectedIndex);
       this.treegrid.selectCheckboxes(selectedIndex.indexs);
       this.multipleSelectId.push(event.data.id);
       for (const value of selectedIndex.id) {
@@ -664,21 +660,22 @@ export class TableComponent implements OnInit {
         if (index > -1) {
           this.multipleSelectId.splice(index, 1);
         }
-        let selectedIndex = {indexs: [], id: []};
-        this.getChildsIndex(event.data,selectedIndex);
+        const selectedIndex = {indexs: [], id: []};
+        this.getChildsIndex(event.data, selectedIndex);
 
-        for (const [key,element] of selectedIndex.id.entries()) {
+        for (const [key, element] of selectedIndex.id.entries()) {
           const indexChild = this.multipleSelectId.indexOf(element);
           if (indexChild > -1) {
             this.multipleSelectId.splice(indexChild, 1);
             this.treeGridObj.getRowByIndex(selectedIndex.indexs[key]).getElementsByTagName('span')[0].classList.remove('e-check');
+            // tslint:disable-next-line: max-line-length
             this.treeGridObj.getRowByIndex(selectedIndex.indexs[key]).getElementsByClassName('e-gridchkbox')[0].parentElement.classList.remove('e-disable-interaction');
           }
         }
         // this.treegrid.clearSelection();
         // this.treegrid.refreshColumns();
         if (this.multipleSelectId.length) {
-          let indexArray = [];
+          const indexArray = [];
           for (const select of this.multipleSelectId) {
             indexArray.push(this.getIndexById(select.id, this.tableData));
           }
@@ -688,13 +685,14 @@ export class TableComponent implements OnInit {
     }
   }
 
-  private getChildsIndex(data,obj) {
-    var childAll = data.childRecords;
+  // tslint:disable-next-line: typedef
+  public getChildsIndex(data, obj) {
+    const childAll = data.childRecords;
 
-    if(childAll && childAll.length) {
+    if (childAll && childAll.length) {
       childAll.map((child) => {
-        if(child.childRecords) {
-          this.getChildsIndex(child,obj);
+        if (child.childRecords) {
+          this.getChildsIndex(child, obj);
         }
         this.treeGridObj.getRowByIndex(child.index).getElementsByClassName('e-gridchkbox')[0].parentElement.classList.add('e-disable-interaction');
         obj.indexs.push(child.index);
