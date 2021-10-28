@@ -639,7 +639,7 @@ export class TableComponent implements OnInit, TableActions{
       approved: null,
       isSubtask: null,
       subtasks: null,
-      sortId: 1
+      sortId: this.tableData[this.tableData.length - 1].sortId + 1
     };
 
     this.taskService.createTask(this.task);
