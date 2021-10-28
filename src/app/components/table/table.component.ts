@@ -60,7 +60,9 @@ export class TableComponent implements OnInit {
   public dropData: Object[];
   // tslint:disable-next-line: ban-types
   public fields: Object;
-  public selectionOptions: SelectionSettingsModel;
+  public selectionOptions: SelectionSettingsModel = {
+    persistSelection: true
+  };
   public toolbar: any;
   public selectedIndex = -1;
   public freezeIndex = 0;
@@ -76,6 +78,7 @@ export class TableComponent implements OnInit {
   isEditing = false;
   isCut = false;
   parentTasks: Task[];
+  multipleSelectId: any[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -275,16 +278,35 @@ export class TableComponent implements OnInit {
     } else if (args.item.id === 'addchild') {
       this.addchild(args);
     } else if (args.item.id === 'delete' && args.item.target === '.e-content') {
-      this.taskService.deleteTask(args.rowInfo.rowData.taskData.key);
+      if (this.multipleSelectId.length > 1) {
+        for (const selectId of this.multipleSelectId) {
+          let data = this.getItemById(selectId);
+          this.taskService.deleteTask(data.key);
+        }
+      } else {
+        this.taskService.deleteTask(args.rowInfo.rowData.taskData.key);
+      }
     } else if (args.item.id === 'cut' && args.item.target === '.e-content') {
       this.isCut = true;
       this.copiedTasks = [];
-      this.copiedTasks.push(this.getItemById(args.rowInfo.rowData.taskData.id));
+      if (this.multipleSelectId.length > 1) {
+        for (const selectId of this.multipleSelectId) {
+          this.copiedTasks.push(this.getItemById(selectId));
+        }
+      } else {
+        this.copiedTasks.push(this.getItemById(args.rowInfo.rowData.taskData.id));
+      }
       // this.taskService.deleteTask(args.rowInfo.rowData.taskData.key);
     } else if (args.item.id === 'copy' && args.item.target === '.e-content') {
       this.isCut = false;
       this.copiedTasks = [];
-      this.copiedTasks.push(this.getItemById(args.rowInfo.rowData.taskData.id));
+      if (this.multipleSelectId.length > 1) {
+        for (const selectId of this.multipleSelectId) {
+          this.copiedTasks.push(this.getItemById(selectId));
+        }
+      } else {
+        this.copiedTasks.push(this.getItemById(args.rowInfo.rowData.taskData.id));
+      }
     } else if (args.item.id === 'pastenext' && args.item.target === '.e-content') {
       this.pasteNextRecords(this.copiedTasks, args);
     } else if (args.item.id === 'pastechild' && args.item.target === '.e-content') {
@@ -476,41 +498,47 @@ export class TableComponent implements OnInit {
       return;
     }
     const newRecordId = uuidv4();
-    this.childRow = tasks[0];
-    if (data.rowInfo.rowData.taskData.isSubtask){
-      this.childRow.isSubtask = true;
-      let recordToUpdate: Task;
-      for (const task of this.responseData){
-        if (task.subtasks){
-          for (let index = 0; index < task.subtasks.length; index++){
-            task.subtasks[index] = task.subtasks[index].id;
+    if(tasks.length) {
+      for(const taskRow of tasks) {
+        this.childRow = taskRow;
+        if (data.rowInfo.rowData.taskData.isSubtask){
+          this.childRow.isSubtask = true;
+          let recordToUpdate: Task;
+          for (const task of this.responseData){
+            if (task.subtasks){
+              for (let index = 0; index < task.subtasks.length; index++){
+                task.subtasks[index] = task.subtasks[index].id;
+              }
+              if (task.subtasks[0] && task.subtasks.includes(data.rowInfo.rowData.taskData.id)){
+                task.subtasks.splice(task.subtasks.indexOf(data.rowInfo.rowData.taskData.id) + 1, 0, newRecordId);
+                recordToUpdate = task;
+              }}
           }
-          if (task.subtasks[0] && task.subtasks.includes(data.rowInfo.rowData.taskData.id)){
-          task.subtasks.splice(task.subtasks.indexOf(data.rowInfo.rowData.taskData.id) + 1, 0, newRecordId);
-          recordToUpdate = task;
-        }}
-      }
-      this.childRow.id = newRecordId;
-      this.taskService.createTask(this.childRow);
-      this.taskService.updateTask(recordToUpdate.key , recordToUpdate);
+          this.childRow.id = newRecordId;
+          this.taskService.createTask(this.childRow);
+          this.taskService.updateTask(recordToUpdate.key , recordToUpdate);
 
-    } else{
-      this.childRow.isSubtask = false;
-      const prevIndex = this.getIndexById(data.rowInfo.rowData.taskData.id , this.tableData);
-      if (prevIndex !== this.tableData.length - 1){
-      this.childRow.sortId = (this.tableData[prevIndex].sortId + this.tableData[prevIndex + 1].sortId) / 2;
-      } else {
-      this.childRow.sortId = this.tableData[prevIndex].sortId + 1;
+        } else{
+          this.childRow.isSubtask = false;
+          const prevIndex = this.getIndexById(data.rowInfo.rowData.taskData.id , this.tableData);
+          if (prevIndex !== this.tableData.length - 1){
+            this.childRow.sortId = (this.tableData[prevIndex].sortId + this.tableData[prevIndex + 1].sortId) / 2;
+          } else {
+            this.childRow.sortId = this.tableData[prevIndex].sortId + 1;
+          }
+          this.childRow.id = newRecordId;
+          this.taskService.createTask(this.childRow);
+        }
       }
-      this.childRow.id = newRecordId;
-      this.taskService.createTask(this.childRow);
-    }
-    if (this.isCut){
-      for (const task of tasks) {
-        this.taskService.deleteTask(task.key);
+
+      if (this.isCut){
+        for (const task of tasks) {
+          this.taskService.deleteTask(task.key);
+        }
+        this.isCut = false;
       }
-      this.isCut = false;
     }
+
   }
 
   pasteChildRecords(tasks: any, parentTaskId: string, key: string): void {
@@ -613,5 +641,59 @@ export class TableComponent implements OnInit {
     };
 
     this.taskService.createTask(this.task);
+  }
+
+  getCheckboxData(event: any, type: string) {
+    if (type === 'select') {
+      let selectedIndex = {indexs: [], id: []};
+      this.getChildsIndex(event.data,selectedIndex);
+      this.treegrid.selectCheckboxes(selectedIndex.indexs);
+      this.multipleSelectId.push(event.data.id);
+      for (const value of selectedIndex.id) {
+        this.multipleSelectId.push(value);
+      }
+    } else {
+      if (this.multipleSelectId.length) {
+        const index = this.multipleSelectId.indexOf(event.data.id);
+        if (index > -1) {
+          this.multipleSelectId.splice(index, 1);
+        }
+        let selectedIndex = {indexs: [], id: []};
+        this.getChildsIndex(event.data,selectedIndex);
+
+        for (const [key,element] of selectedIndex.id.entries()) {
+          const indexChild = this.multipleSelectId.indexOf(element);
+          if (indexChild > -1) {
+            this.multipleSelectId.splice(indexChild, 1);
+            this.treeGridObj.getRowByIndex(selectedIndex.indexs[key]).getElementsByTagName('span')[0].classList.remove('e-check');
+            this.treeGridObj.getRowByIndex(selectedIndex.indexs[key]).getElementsByClassName('e-gridchkbox')[0].parentElement.classList.remove('e-disable-interaction');
+          }
+        }
+        // this.treegrid.clearSelection();
+        // this.treegrid.refreshColumns();
+        if (this.multipleSelectId.length) {
+          let indexArray = [];
+          for (const select of this.multipleSelectId) {
+            indexArray.push(this.getIndexById(select.id, this.tableData));
+          }
+          this.treegrid.selectCheckboxes(indexArray);
+        }
+      }
+    }
+  }
+
+  private getChildsIndex(data,obj) {
+    var childAll = data.childRecords;
+
+    if(childAll && childAll.length) {
+      childAll.map((child) => {
+        if(child.childRecords) {
+          this.getChildsIndex(child,obj);
+        }
+        this.treeGridObj.getRowByIndex(child.index).getElementsByClassName('e-gridchkbox')[0].parentElement.classList.add('e-disable-interaction');
+        obj.indexs.push(child.index);
+        obj.id.push(child.id);
+      });
+    }
   }
 }
