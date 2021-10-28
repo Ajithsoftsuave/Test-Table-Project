@@ -1,0 +1,23 @@
+* {
+  box-sizing: border-box;
+}
+.e-gridheader.e-lib.e-draggable.e-droppable {
+    position: sticky;
+    top: 0;
+    z-index: 999;
+}
+
+
+div#treegridcomp_gridcontrol {
+    height: calc(100vh - 220px);
+    overflow: auto;
+    position: relative;
+}
+
+#addnext {
+    display: none !important;
+  }
+  
+  #addchild {
+    display: none !important;
+  }

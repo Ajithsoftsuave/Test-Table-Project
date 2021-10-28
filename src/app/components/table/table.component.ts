@@ -92,14 +92,14 @@ export class TableComponent implements OnInit, TableActions{
   ngOnInit(): void {
     // items should be in context menu. type string are default, type object are custom options
     this.contextMenuItems = [
-      { text: 'Add Next', target: '.e-content', id: 'addnext' },
-      { text: 'Add Child', target: '.e-content', id: 'addchild' },
+      { text: 'Add Next', target: '.e-content', id: 'addnext', enabled : true},
+      { text: 'Add Child', target: '.e-content', id: 'addchild', enabled : true },
       { text: 'Delete', target: '.e-content', id: 'delete' },
-      { text: 'Edit', target: '.e-content', id: 'edit' },
+      { text: 'Edit', target: '.e-content', id: 'edit', enabled : true },
       { text: 'Copy', target: '.e-content', id: 'copy' },
       { text: 'Cut', target: '.e-content', id: 'cut' },
-      { text: 'Paste Next', target: '.e-content', id: 'pastenext' },
-      { text: 'Paste Child', target: '.e-content', id: 'pastechild' },
+      { text: 'Paste Next', target: '.e-content', id: 'pastenext', enabled : true },
+      { text: 'Paste Child', target: '.e-content', id: 'pastechild', enabled : true },
       {
         text: 'Style',
         target: '.e-headercell',
@@ -268,18 +268,25 @@ export class TableComponent implements OnInit, TableActions{
   }
   // while clicking options in context menu
   public contextMenuClick(args?): void {
+    args.element.firstElementChild.classList.add('e-disabled');
     if (args.item.id === 'addnext') {
       this.addnext(args);
     } else if (args.item.id === 'addchild') {
       this.addchild(args);
     } else if (args.item.id === 'delete' && args.item.target === '.e-content') {
-      if (this.multipleSelectId.length > 1) {
-        for (const selectId of this.multipleSelectId) {
-          const data = this.getItemById(selectId);
-          this.taskService.deleteTask(data.key);
+      if (
+        confirm('Are you sure you want to delete selected items permanently?')
+      ) {
+        if (this.multipleSelectId.length > 1) {
+          for (const selectId of this.multipleSelectId) {
+            const data = this.getItemById(selectId);
+            this.taskService.deleteTask(data.key);
+          }
+        } else {
+          this.taskService.deleteTask(args.rowInfo.rowData.taskData.key);
         }
       } else {
-        this.taskService.deleteTask(args.rowInfo.rowData.taskData.key);
+        return;
       }
     } else if (args.item.id === 'cut' && args.item.target === '.e-content') {
       this.isCut = true;
@@ -660,6 +667,23 @@ export class TableComponent implements OnInit, TableActions{
       for (const value of selectedIndex.id) {
         this.multipleSelectId.push(value);
       }
+      if (this.multipleSelectId.length === 1){
+        this.contextMenuItems[0].enabled = true;
+        this.contextMenuItems[1].enabled = true;
+        this.contextMenuItems[3].enabled = true;
+        this.contextMenuItems[6].enabled = true;
+        this.contextMenuItems[7].enabled = true;
+        const temp = [...this.contextMenuItems];
+        this.contextMenuItems = [...temp];
+      } else {
+        this.contextMenuItems[0].enabled = false;  // disabled add next
+        this.contextMenuItems[1].enabled = false;  // disabled add next
+        this.contextMenuItems[3].enabled = false;  // disabled add next
+        this.contextMenuItems[6].enabled = false;  // disabled add next
+        this.contextMenuItems[7].enabled = false;  // disabled add next
+        const temp = [...this.contextMenuItems];
+        this.contextMenuItems = [...temp];
+      }
     } else {
       if (this.multipleSelectId.length) {
         const index = this.multipleSelectId.indexOf(event.data.id);
@@ -683,7 +707,28 @@ export class TableComponent implements OnInit, TableActions{
         if (this.multipleSelectId.length) {
           const indexArray = [];
           for (const select of this.multipleSelectId) {
-            indexArray.push(this.getIndexById(select.id, this.tableData));
+            try{
+              indexArray.push(this.getIndexById(select.id, this.tableData));
+            } catch {
+              //
+            }
+          }
+          if (this.multipleSelectId.length === 1){
+            this.contextMenuItems[0].enabled = true;
+            this.contextMenuItems[1].enabled = true;
+            this.contextMenuItems[3].enabled = true;
+            this.contextMenuItems[6].enabled = true;
+            this.contextMenuItems[7].enabled = true;
+            const temp = [...this.contextMenuItems];
+            this.contextMenuItems = [...temp];
+          } else {
+            this.contextMenuItems[0].enabled = false;  // disabled add next
+            this.contextMenuItems[1].enabled = false;  // disabled add next
+            this.contextMenuItems[3].enabled = false;  // disabled add next
+            this.contextMenuItems[6].enabled = false;  // disabled add next
+            this.contextMenuItems[7].enabled = false;  // disabled add next
+            const temp = [...this.contextMenuItems];
+            this.contextMenuItems = [...temp];
           }
           this.treegrid.selectCheckboxes(indexArray);
         }
