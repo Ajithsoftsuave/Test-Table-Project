@@ -5,7 +5,7 @@ import {
   PageService,
   EditService,
   ContextMenuService,
-  TreeGridComponent, ColumnChooserService, ToolbarService,
+  TreeGridComponent, ColumnChooserService, ToolbarService, Column,
 } from '@syncfusion/ej2-angular-treegrid';
 import { EditSettingsModel, ToolbarItems } from '@syncfusion/ej2-treegrid';
 import { MenuEventArgs } from '@syncfusion/ej2-navigations';
@@ -328,9 +328,14 @@ export class TableComponent implements OnInit {
     }
 
     }else if (args.item.id === 'insert') {
-      const columnName = { field: 'data', width: 100 };
-    // this.treegrid.columns.push(columnName); // Insert Columns
-      this.treegrid.refreshColumns(); // Refresh Columns
+     let headertxt =  prompt('enter column header name');
+      let c = <Column[]>
+        [  { field: 'New Column', headerText: headertxt, width: 130, format: 'yMd', textAlign: 'Right' ,allowReordering: true },
+        ];
+      for( let i: number = 0; i < c.length; i++ ) {
+        (this.treegrid.columns as Column[]).push(c[i]);
+        this.treegrid.refreshColumns();
+      }
     } else if (args.item.id === 'deleteColumn') {
       let columnIndex;
       this.treegrid.columns.forEach((col, index) => {
