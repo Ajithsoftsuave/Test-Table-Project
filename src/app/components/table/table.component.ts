@@ -106,8 +106,8 @@ export class TableComponent implements OnInit {
         target: '.e-headercell',
         id: 'paste',
         items: [
-          { text: 'Data-Type', id: 'datatype' },
-          { text: 'Default-Value', id: 'defaultvalue' },
+          { text: 'Data-Type', id: 'datatype', items: [ { text: 'Text', id: 'dt-text'} , { text: 'Num', id: 'dt-num'} , { text: 'Date', id: 'dt-date'} , { text: 'Boolean', id: 'dt-bool'}, { text: 'Drop Down', id: 'dt-dropdown'}] },
+          { text: 'Default-Value', id: 'defaultvalue' , items: [ { text: 'Text', id: 'dt-text'} , { text: 'Num', id: 'dt-num'} , { text: 'Date', id: 'dt-date'} , { text: 'Boolean', id: 'dt-bool'}, { text: 'Drop Down', id: 'dt-dropdown'}] },
           // tslint:disable-next-line:max-line-length
           { text: 'Minimum-Column-Width', id: 'minwidth' , items: [ { text: 'No', id: 'min-width-no' , wid: 0}, { text: 'Yes (Default: 100)', id: 'min-width-yes' , wid: 100} ] },
           { text: 'Font-size', id: 'fontsize' , items: [ { text: '10px', id: 'fs-10' }, { text: '13px', id: 'fs-13' }, { text: '20px', id: 'fs-20' }] },
