@@ -323,11 +323,11 @@ export class TableComponent implements OnInit, TableActions{
     }
 
     }else if (args.item.id === 'insert') {
-     const headertxt =  prompt('enter column header name');
-     const c = [  { field: 'New Column', headerText: headertxt, width: 130, format: 'yMd', textAlign: 'Right' , allowReordering: true },
-        ] as Column[];
-      // tslint:disable-next-line: prefer-for-of
-     for ( let i = 0; i < c.length; i++ ) {
+     let headertxt =  prompt('enter column header name');
+      let c = <Column[]>
+        [  { field: headertxt.replace(/\s/g, ""), headerText: headertxt, width: 130, format: 'yMd', textAlign: 'Right' ,allowReordering: true },
+        ];
+      for( let i: number = 0; i < c.length; i++ ) {
         (this.treegrid.columns as Column[]).push(c[i]);
         this.treegrid.refreshColumns();
       }
