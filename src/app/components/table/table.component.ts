@@ -330,7 +330,7 @@ export class TableComponent implements OnInit {
     }else if (args.item.id === 'insert') {
      let headertxt =  prompt('enter column header name');
       let c = <Column[]>
-        [  { field: 'New Column', headerText: headertxt, width: 130, format: 'yMd', textAlign: 'Right' ,allowReordering: true },
+        [  { field: headertxt.replace(/\s/g, ""), headerText: headertxt, width: 130, format: 'yMd', textAlign: 'Right' ,allowReordering: true },
         ];
       for( let i: number = 0; i < c.length; i++ ) {
         (this.treegrid.columns as Column[]).push(c[i]);
