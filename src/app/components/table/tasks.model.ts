@@ -19,7 +19,7 @@ export interface TableActions{
     makeTreeGrid(): void;
     appendSubTasks(parentTask: Task): Task;
     getItemById(id: string): Task;
-    getIndexById(iid: string, data: Task[]): number;
+    getRowIndexById(iid: string, data: Task[]): number;
     openContextMenu(): void;
     ngAfterViewInit(): void;
     addnext(data: any): void;

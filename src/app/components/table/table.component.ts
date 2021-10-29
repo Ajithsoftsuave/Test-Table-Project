@@ -7,13 +7,10 @@ import {
   ContextMenuService,
   TreeGridComponent, ColumnChooserService, ToolbarService, Column,
 } from '@syncfusion/ej2-angular-treegrid';
-import { EditSettingsModel } from '@syncfusion/ej2-treegrid';
-import { ClipboardService } from 'ngx-clipboard';
-import { SelectionSettingsModel } from '@syncfusion/ej2-angular-treegrid';
+import { EditSettingsModel, SelectionSettingsModel } from '@syncfusion/ej2-treegrid';
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { TableActions, Task } from './tasks.model';
 import { TaskService } from './task.service';
-import { AngularFireDatabase } from '@angular/fire/database';
 import { v4 as uuidv4 } from 'uuid';
 import { FormBuilder, FormGroup } from '@angular/forms';
 
@@ -76,11 +73,9 @@ export class TableComponent implements OnInit, TableActions{
   parentTasks: Task[];
   multipleSelectId: any[] = [];
 
-  constructor(
+  public constructor(
     private fb: FormBuilder,
-    private clipboardService: ClipboardService,
     private taskService: TaskService,
-    private db: AngularFireDatabase
   ) {
     // this.data = sampleData;
     taskService.getTaskList().subscribe((data) => {
@@ -212,7 +207,7 @@ export class TableComponent implements OnInit, TableActions{
     return null;
   }
 
-  public getIndexById(id: string, data: Task[]): number {
+  public getRowIndexById(id: string, data: Task[]): number {
     // tslint:disable-next-line: prefer-for-of
     for (let index = 0; index < data.length; index++) {
       if (id === data[index].id) {
@@ -273,7 +268,102 @@ export class TableComponent implements OnInit, TableActions{
     } else if (args.item.id === 'addchild') {
       this.addchild(args);
     } else if (args.item.id === 'delete' && args.item.target === '.e-content') {
-      if (
+      this.deleteRow(args);
+    } else if (args.item.id === 'cut' && args.item.target === '.e-content') {
+      this.cutRow(args);
+    } else if (args.item.id === 'copy' && args.item.target === '.e-content') {
+      this.copyRow(args);
+    } else if (args.item.id === 'pastenext' && args.item.target === '.e-content') {
+      this.pasteNextRecords(this.copiedTasks, args);
+    } else if (args.item.id === 'pastechild' && args.item.target === '.e-content') {
+      this.pasteChildRecords(this.copiedTasks, args.rowInfo.rowData.taskData.id, args.rowInfo.rowData.taskData.key);
+    } else if (args.item.id === 'edit' && args.item.target === '.e-content') {
+      this.editRow(args.rowInfo.rowData.taskData, args.rowInfo.rowData.taskData.key);
+    }else if (args.item.id === 'freeze') {
+      this.freezeColumn();
+    }else if (args.item.id === 'insert') {
+     this.insertColumn();
+    } else if (args.item.id === 'deleteColumn') {
+      this.deleteColumn();
+    } else if (args.item.id === 'renameColumn') {
+      this.renameColumn();
+    } else if (args.item.id === 'min-width-no' || args.item.id === 'min-width-yes') {
+      this.treegrid.getColumnByField(this.activeContextMenuColumn.field).minWidth = args.item.wid;
+      this.treegrid.refreshColumns();
+    } else if (args.item.id === 'al-right' || args.item.id === 'al-left' || args.item.id === 'al-center' || args.item.id === 'al-justify') {
+        this.treegrid.getColumnByField(this.activeContextMenuColumn.field).textAlign = args.item.text;
+        this.treegrid.refreshColumns();
+    }else if (args.item.id === 'tw-clip' || args.item.id === 'tw-ellipsis-tooltip' || args.item.id === 'tw-ellipsis') {
+        this.treegrid.getColumnByField(this.activeContextMenuColumn.field).clipMode = args.item.text;
+        this.treegrid.refreshColumns();
+    }else if (args.item.id === 'bg-red' || args.item.id === 'bg-blue' ||  args.item.id === 'bg-white' ) {
+       this.setBackGround();
+    }else if (args.item.id === 'cl-white' || args.item.id === 'cl-black' ) {
+      this.setBackGroundBlackAndWhite();
+    }else if (args.item.id === 'fs-10' || args.item.id === 'fs-13' || args.item.id === 'fs-20' ) {
+      this.setFontSize();
+    }
+  }
+
+  public setBackGround(): void {
+    let bgindex = -1;
+       // @ts-ignore
+    this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.forEach((a, index) => {
+         if (a.includes('bg')) {
+           bgindex = index;
+         }
+       });
+
+    if (bgindex !== -1) {
+         // @ts-ignore
+         this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.splice(bgindex, 1);
+       }
+
+      // @ts-ignore
+    this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.push(args.item.id);
+    this.treegrid.refreshColumns();
+  }
+
+  public setBackGroundBlackAndWhite(): void {
+    let clindex = -1;
+      // @ts-ignore
+    this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.forEach((a, index) => {
+        if (a.includes('cl')) {
+          clindex = index;
+        }
+      });
+
+    if (clindex !== -1) {
+        // @ts-ignore
+        this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.splice(clindex, 1);
+      }
+
+      // @ts-ignore
+    this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.push(args.item.id);
+    this.treegrid.refreshColumns();
+  }
+
+  public setFontSize(): void {
+    let fsindex = -1;
+      // @ts-ignore
+    this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.forEach((a, index) => {
+        if (a.includes('fs')) {
+          fsindex = index;
+        }
+      });
+
+    if (fsindex !== -1) {
+        // @ts-ignore
+        this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.splice(fsindex, 1);
+      }
+
+      // @ts-ignore
+    this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.push(args.item.id);
+    this.treegrid.refreshColumns();
+  }
+
+  public deleteRow(args: any): void{
+    if (
         confirm('Are you sure you want to delete selected items permanently?')
       ) {
         if (this.multipleSelectId.length > 1) {
@@ -287,38 +377,40 @@ export class TableComponent implements OnInit, TableActions{
       } else {
         return;
       }
-    } else if (args.item.id === 'cut' && args.item.target === '.e-content') {
-      this.isCut = true;
-      this.copiedTasks = [];
-      if (this.multipleSelectId.length > 1) {
-        for (const selectId of this.multipleSelectId) {
-          this.copiedTasks.push(this.getItemById(selectId));
-        }
-      } else {
-        this.copiedTasks.push(this.getItemById(args.rowInfo.rowData.taskData.id));
-      }
-      // this.taskService.deleteTask(args.rowInfo.rowData.taskData.key);
-    } else if (args.item.id === 'copy' && args.item.target === '.e-content') {
-      this.isCut = false;
-      this.copiedTasks = [];
-      if (this.multipleSelectId.length > 1) {
-        for (const selectId of this.multipleSelectId) {
-          this.copiedTasks.push(this.getItemById(selectId));
-        }
-      } else {
-        this.copiedTasks.push(this.getItemById(args.rowInfo.rowData.taskData.id));
-      }
-    } else if (args.item.id === 'pastenext' && args.item.target === '.e-content') {
-      this.pasteNextRecords(this.copiedTasks, args);
-    } else if (args.item.id === 'pastechild' && args.item.target === '.e-content') {
-      this.pasteChildRecords(this.copiedTasks, args.rowInfo.rowData.taskData.id, args.rowInfo.rowData.taskData.key);
-    } else if (args.item.id === 'edit' && args.item.target === '.e-content') {
-      this.editRow(args.rowInfo.rowData.taskData, args.rowInfo.rowData.taskData.key);
-    }else if (args.item.id === 'freeze') {
-      const treegridtreegridcomp = window.localStorage.getItem('treegridtreegridcomp');
-      const treegridtreegridcompJSON = JSON.parse(treegridtreegridcomp);
+  }
 
-      if (treegridtreegridcomp) {
+  public cutRow(args: any): void {
+    this.isCut = true;
+    this.copiedTasks = [];
+    if (this.multipleSelectId.length > 1) {
+      for (const selectId of this.multipleSelectId) {
+        this.copiedTasks.push(this.getItemById(selectId));
+      }
+    } else {
+      this.copiedTasks.push(this.getItemById(args.rowInfo.rowData.taskData.id));
+    }
+      // this.taskService.deleteTask(args.rowInfo.rowData.taskData.key);
+  }
+
+  public copyRow(args: any): void {
+    this.isCut = false;
+    this.copiedTasks = [];
+    if (this.multipleSelectId.length > 1) {
+        for (const selectId of this.multipleSelectId) {
+          this.copiedTasks.push(this.getItemById(selectId));
+        }
+      } else {
+        this.copiedTasks.push(
+          this.getItemById(args.rowInfo.rowData.taskData.id)
+        );
+      }
+  }
+
+  public freezeColumn(): void {
+    const treegridtreegridcomp = window.localStorage.getItem('treegridtreegridcomp');
+    const treegridtreegridcompJSON = JSON.parse(treegridtreegridcomp);
+
+    if (treegridtreegridcomp) {
        treegridtreegridcompJSON.columns.forEach((column, index, arr) => {
           if (column && column.field === this.activeContextMenuColumn.field ) {
             if ( index + 1 !== arr.length) {
@@ -327,94 +419,42 @@ export class TableComponent implements OnInit, TableActions{
           }
         });
     }
+  }
 
-    }else if (args.item.id === 'insert') {
-     let headertxt =  prompt('enter column header name');
-      let c = <Column[]>
-        [  { field: headertxt.replace(/\s/g, ""), headerText: headertxt, width: 130, format: 'yMd', textAlign: 'Right' ,allowReordering: true },
+  public insertColumn(): void{
+    const headertxt =  prompt('enter column header name');
+      // tslint:disable-next-line: prefer-const
+    let c = <Column[]>
+        // tslint:disable-next-line: quotemark
+        // tslint:disable-next-line: max-line-length
+        [  { field: headertxt.replace(/\s/g, ''), headerText: headertxt, width: 130, format: 'yMd', textAlign: 'Right' ,allowReordering: true },
         ];
-      for( let i: number = 0; i < c.length; i++ ) {
+      // tslint:disable-next-line: align
+      // tslint:disable-next-line: prefer-for-of
+    for ( let i = 0; i < c.length; i++ ) {
         (this.treegrid.columns as Column[]).push(c[i]);
         this.treegrid.refreshColumns();
       }
-    } else if (args.item.id === 'deleteColumn') {
-      let columnIndex;
-      this.treegrid.columns.forEach((col, index) => {
+  }
+
+  public deleteColumn(): void {
+    let columnIndex;
+    this.treegrid.columns.forEach((col, index) => {
         if ( col.field === this.activeContextMenuColumn.field ) {
           columnIndex = index;
         }
       });
 
-      this.treegrid.columns.splice(columnIndex, 1); // Splice columns
-      this.treegrid.refreshColumns(); // Refresh Columns
-    } else if (args.item.id === 'renameColumn') {
-      const data = this.activeContextMenuColumn.field;
-      const headerTxt = prompt('Enter the header name');
-      this.treegrid.getColumnByField(data).headerText = headerTxt;
-      this.treegrid.refreshColumns();
-    } else if (args.item.id === 'min-width-no' || args.item.id === 'min-width-yes') {
-      this.treegrid.getColumnByField(this.activeContextMenuColumn.field).minWidth = args.item.wid;
-      this.treegrid.refreshColumns();
-    } else if (args.item.id === 'al-right' || args.item.id === 'al-left' || args.item.id === 'al-center' || args.item.id === 'al-justify') {
-        this.treegrid.getColumnByField(this.activeContextMenuColumn.field).textAlign = args.item.text;
-        this.treegrid.refreshColumns();
-    }else if (args.item.id === 'tw-clip' || args.item.id === 'tw-ellipsis-tooltip' || args.item.id === 'tw-ellipsis') {
-        this.treegrid.getColumnByField(this.activeContextMenuColumn.field).clipMode = args.item.text;
-        this.treegrid.refreshColumns();
-    }else if (args.item.id === 'bg-red' || args.item.id === 'bg-blue' ||  args.item.id === 'bg-white' ) {
-       let bgindex = -1;
-       // @ts-ignore
-       this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.forEach((a, index) => {
-         if (a.includes('bg')) {
-           bgindex = index;
-         }
-       });
-
-       if (bgindex !== -1) {
-         // @ts-ignore
-         this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.splice(bgindex, 1);
-       }
-
-      // @ts-ignore
-       this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.push(args.item.id);
-       this.treegrid.refreshColumns();
-    }else if (args.item.id === 'cl-white' || args.item.id === 'cl-black' ) {
-      let clindex = -1;
-      // @ts-ignore
-      this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.forEach((a, index) => {
-        if (a.includes('cl')) {
-          clindex = index;
-        }
-      });
-
-      if (clindex !== -1) {
-        // @ts-ignore
-        this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.splice(clindex, 1);
-      }
-
-      // @ts-ignore
-      this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.push(args.item.id);
-      this.treegrid.refreshColumns();
-    }else if (args.item.id === 'fs-10' || args.item.id === 'fs-13' || args.item.id === 'fs-20' ) {
-      let fsindex = -1;
-      // @ts-ignore
-      this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.forEach((a, index) => {
-        if (a.includes('fs')) {
-          fsindex = index;
-        }
-      });
-
-      if (fsindex !== -1) {
-        // @ts-ignore
-        this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.splice(fsindex, 1);
-      }
-
-      // @ts-ignore
-      this.treegrid.getColumnByField(this.activeContextMenuColumn.field).customAttributes.class.push(args.item.id);
-      this.treegrid.refreshColumns();
-    }
+    this.treegrid.columns.splice(columnIndex, 1); // Splice columns
+    this.treegrid.refreshColumns(); // Refresh Columns
   }
 
+  public renameColumn(): void {
+    const data = this.activeContextMenuColumn.field;
+    const headerTxt = prompt('Enter the header name');
+    this.treegrid.getColumnByField(data).headerText = headerTxt;
+    this.treegrid.refreshColumns();
+  }
   // tslint:disable-next-line: typedef
   public addnext(data: any) {
     const newRecordId = uuidv4();
@@ -448,7 +488,7 @@ export class TableComponent implements OnInit, TableActions{
 
     } else{
       this.childRow.isSubtask = false;
-      const prevIndex = this.getIndexById(data.rowInfo.rowData.taskData.id , this.tableData);
+      const prevIndex = this.getRowIndexById(data.rowInfo.rowData.taskData.id , this.tableData);
       if (prevIndex !== this.tableData.length - 1){
       this.childRow.sortId = (this.tableData[prevIndex].sortId + this.tableData[prevIndex + 1].sortId) / 2;
       } else {
@@ -500,7 +540,7 @@ export class TableComponent implements OnInit, TableActions{
     const index = data.index;
   }
 
-  public pasteNextRecords(tasks: any, data): void {
+  public pasteNextRecords(tasks: any, data: any): void {
     if (!tasks){
       alert('No copied value');
       return;
@@ -528,7 +568,7 @@ export class TableComponent implements OnInit, TableActions{
 
         } else{
           this.childRow.isSubtask = false;
-          const prevIndex = this.getIndexById(data.rowInfo.rowData.taskData.id , this.tableData);
+          const prevIndex = this.getRowIndexById(data.rowInfo.rowData.taskData.id , this.tableData);
           if (prevIndex !== this.tableData.length - 1){
             this.childRow.sortId = (this.tableData[prevIndex].sortId + this.tableData[prevIndex + 1].sortId) / 2;
           } else {
@@ -707,7 +747,7 @@ export class TableComponent implements OnInit, TableActions{
           const indexArray = [];
           for (const select of this.multipleSelectId) {
             try{
-              indexArray.push(this.getIndexById(select.id, this.tableData));
+              indexArray.push(this.getRowIndexById(select.id, this.tableData));
             } catch {
               //
             }
