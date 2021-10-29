@@ -268,7 +268,6 @@ export class TableComponent implements OnInit, TableActions{
   }
   // while clicking options in context menu
   public contextMenuClick(args?): void {
-    args.element.firstElementChild.classList.add('e-disabled');
     if (args.item.id === 'addnext') {
       this.addnext(args);
     } else if (args.item.id === 'addchild') {
