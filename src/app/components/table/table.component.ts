@@ -288,14 +288,17 @@ export class TableComponent implements OnInit, TableActions{
     } else if (args.item.id === 'renameColumn') {
       this.renameColumn();
     } else if (args.item.id === 'min-width-no' || args.item.id === 'min-width-yes') {
-      this.treegrid.getColumnByField(this.activeContextMenuColumn.field).minWidth = args.item.wid;
-      this.treegrid.refreshColumns();
+      this.setProperty('minWidth', args.item.wid);
+      // this.treegrid.getColumnByField(this.activeContextMenuColumn.field).minWidth = args.item.wid;
+      // this.treegrid.refreshColumns();
     } else if (args.item.id === 'al-right' || args.item.id === 'al-left' || args.item.id === 'al-center' || args.item.id === 'al-justify') {
-        this.treegrid.getColumnByField(this.activeContextMenuColumn.field).textAlign = args.item.text;
-        this.treegrid.refreshColumns();
+      this.setProperty('textAlign', args.item.text);
+      // this.treegrid.getColumnByField(this.activeContextMenuColumn.field).textAlign = args.item.text;
+      // this.treegrid.refreshColumns();
     }else if (args.item.id === 'tw-clip' || args.item.id === 'tw-ellipsis-tooltip' || args.item.id === 'tw-ellipsis') {
-        this.treegrid.getColumnByField(this.activeContextMenuColumn.field).clipMode = args.item.text;
-        this.treegrid.refreshColumns();
+      this.setProperty('clipMode', args.item.text);
+      // this.treegrid.getColumnByField(this.activeContextMenuColumn.field).clipMode = args.item.text;
+      // this.treegrid.refreshColumns();
     }else if (args.item.id === 'bg-red' || args.item.id === 'bg-blue' ||  args.item.id === 'bg-white' ) {
        this.setBackGround();
     }else if (args.item.id === 'cl-white' || args.item.id === 'cl-black' ) {
@@ -303,6 +306,11 @@ export class TableComponent implements OnInit, TableActions{
     }else if (args.item.id === 'fs-10' || args.item.id === 'fs-13' || args.item.id === 'fs-20' ) {
       this.setFontSize();
     }
+  }
+
+  private setProperty(name, value): void{
+    this.treegrid.getColumnByField(this.activeContextMenuColumn.field)[name] = value;
+    this.treegrid.refreshColumns();
   }
 
   public setBackGround(): void {
