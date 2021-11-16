@@ -91,8 +91,8 @@ export class TableComponent implements OnInit, TableActions{
       { text: 'Add Child', target: '.e-content', id: 'addchild', enabled : true },
       { text: 'Delete', target: '.e-content', id: 'delete' },
       { text: 'Edit', target: '.e-content', id: 'edit', enabled : true },
-      { text: 'Copy', target: '.e-content', id: 'copy' },
-      { text: 'Cut', target: '.e-content', id: 'cut' },
+      { text: 'Copy Rows', target: '.e-content', id: 'copy' },
+      { text: 'Cut Rows', target: '.e-content', id: 'cut' },
       { text: 'Paste Next', target: '.e-content', id: 'pastenext', enabled : true },
       { text: 'Paste Child', target: '.e-content', id: 'pastechild', enabled : true },
       {
@@ -172,7 +172,8 @@ export class TableComponent implements OnInit, TableActions{
   // append subtasks
   public appendSubTasks(parentTask: Task): Task {
     // tslint:disable-next-line: prefer-for-of
-    for (let i = 0; i < parentTask.subtasks.length; i++) {
+    let i = 0;
+    while (i < parentTask.subtasks.length){
       if (this.getItemById(parentTask.subtasks[i])?.subtasks) {
         parentTask.subtasks[i] = this.appendSubTasks(
           this.getItemById(parentTask.subtasks[i])
@@ -185,6 +186,11 @@ export class TableComponent implements OnInit, TableActions{
           parentTask.subtasks.splice(i, 1);
         }
       }
+      const prevElement = parentTask.subtasks[i];
+      if (typeof prevElement !== 'string'){
+        i = i + 1;
+      }
+
     }
     return parentTask;
   }
@@ -378,9 +384,11 @@ export class TableComponent implements OnInit, TableActions{
           for (const selectId of this.multipleSelectId) {
             const data = this.getItemById(selectId);
             this.taskService.deleteTask(data.key);
+            this.multipleSelectId = [];
           }
         } else {
           this.taskService.deleteTask(args.rowInfo.rowData.taskData.key);
+          this.multipleSelectId = [];
         }
       } else {
         return;
@@ -548,14 +556,24 @@ export class TableComponent implements OnInit, TableActions{
     const index = data.index;
   }
 
-  public pasteNextRecords(tasks: any, data: any): void {
+  public pasteNextRecords(tasksList: any, data: any): void {
+    const tasks = [...tasksList];
     if (!tasks){
       alert('No copied value');
       return;
     }
+    if (this.isCut){
+      for (const task of tasksList) {
+        if (task.key){
+          this.taskService.deleteTask(task.key);
+        }
+      }
+      this.isCut = false;
+    }
     const newRecordId = uuidv4();
     if (tasks.length) {
       for (const taskRow of tasks) {
+        delete taskRow.key;
         this.childRow = taskRow;
         if (data.rowInfo.rowData.taskData.isSubtask){
           this.childRow.isSubtask = true;
@@ -586,21 +604,21 @@ export class TableComponent implements OnInit, TableActions{
           this.taskService.createTask(this.childRow);
         }
       }
-
-      if (this.isCut){
-        for (const task of tasks) {
-          this.taskService.deleteTask(task.key);
-        }
-        this.isCut = false;
-      }
     }
 
   }
 
-  public pasteChildRecords(tasks: any, parentTaskId: string, key: string): void {
+  public pasteChildRecords(tasksList: any, parentTaskId: string, key: string): void {
+    const tasks = [...tasksList];
     if (!tasks){
       alert('No copied value');
       return;
+    }
+    if (this.isCut){
+      for (const task of tasksList) {
+        this.taskService.deleteTask(task.key);
+      }
+      this.isCut = false;
     }
     for (const task of tasks) {
       if (task.id === parentTaskId){
@@ -609,6 +627,7 @@ export class TableComponent implements OnInit, TableActions{
       }
       task.isSubtask = true;
       task.id = uuidv4();
+      delete task.key;
       this.taskService.createTask(task);
     }
     const recordToUpdate: Task = this.getItemById(
@@ -634,12 +653,6 @@ export class TableComponent implements OnInit, TableActions{
       key,
       recordToUpdate
     );
-    if (this.isCut){
-      for (const task of tasks) {
-        this.taskService.deleteTask(task.key);
-      }
-      this.isCut = false;
-    }
   }
 
   public editRow(task: any, key: string): void{
@@ -723,11 +736,11 @@ export class TableComponent implements OnInit, TableActions{
         const temp = [...this.contextMenuItems];
         this.contextMenuItems = [...temp];
       } else {
-        this.contextMenuItems[0].enabled = false;  // disabled add next
-        this.contextMenuItems[1].enabled = false;  // disabled add next
-        this.contextMenuItems[3].enabled = false;  // disabled add next
-        this.contextMenuItems[6].enabled = false;  // disabled add next
-        this.contextMenuItems[7].enabled = false;  // disabled add next
+        this.contextMenuItems[0].enabled = false;
+        this.contextMenuItems[1].enabled = false;
+        this.contextMenuItems[3].enabled = false;
+        this.contextMenuItems[6].enabled = false;
+        this.contextMenuItems[7].enabled = false;
         const temp = [...this.contextMenuItems];
         this.contextMenuItems = [...temp];
       }
@@ -769,11 +782,11 @@ export class TableComponent implements OnInit, TableActions{
             const temp = [...this.contextMenuItems];
             this.contextMenuItems = [...temp];
           } else {
-            this.contextMenuItems[0].enabled = false;  // disabled add next
-            this.contextMenuItems[1].enabled = false;  // disabled add next
-            this.contextMenuItems[3].enabled = false;  // disabled add next
-            this.contextMenuItems[6].enabled = false;  // disabled add next
-            this.contextMenuItems[7].enabled = false;  // disabled add next
+            this.contextMenuItems[0].enabled = false;
+            this.contextMenuItems[1].enabled = false;
+            this.contextMenuItems[3].enabled = false;
+            this.contextMenuItems[6].enabled = false;
+            this.contextMenuItems[7].enabled = false;
             const temp = [...this.contextMenuItems];
             this.contextMenuItems = [...temp];
           }

@@ -4,7 +4,7 @@ import { GridAllModule } from '@syncfusion/ej2-angular-grids';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { TableComponent } from './components/table/table.component';
-import {FreezeService, TreeGridModule} from '@syncfusion/ej2-angular-treegrid';
+import {FreezeService, TreeGridModule, RowDDService } from '@syncfusion/ej2-angular-treegrid';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ClipboardModule } from 'ngx-clipboard';
 import { DropDownListAllModule } from '@syncfusion/ej2-angular-dropdowns';
@@ -42,7 +42,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     ResizeService,
     FreezeService,
     SortService,
-    FilterService
+    FilterService,
+    RowDDService,
   ],
   bootstrap: [AppComponent]
 })

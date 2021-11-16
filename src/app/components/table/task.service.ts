@@ -38,7 +38,9 @@ export class TaskService {
         return this.tasksRef.update(key, value);
     }
 
-    deleteTask(id: string): Promise<void> {
-        return this.tasksRef.remove(id);
+    deleteTask(key: string): Promise<void> {
+        if (key){
+            return this.tasksRef.remove(key);
+        }
     }
 }
