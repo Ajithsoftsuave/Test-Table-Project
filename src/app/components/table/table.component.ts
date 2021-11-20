@@ -75,7 +75,6 @@ export class TableComponent implements OnInit, TableActions{
   multipleSelectId: any[] = [];
   newcolumn: boolean;
   editForm = new FormGroup({
-    Columnname: new FormControl('', [Validators.required]),
     datatype: new FormControl(''),
     Defaultvalue: new FormControl(''),
     ColumnWidth: new FormControl(''),
@@ -85,6 +84,9 @@ export class TableComponent implements OnInit, TableActions{
       Alignment: new FormControl(''),
       textwrap: new FormControl(''),
     
+  })
+  columnForm = new FormGroup({
+    Columnname: new FormControl('', [Validators.required]),
   })
 
   public constructor(
@@ -281,9 +283,20 @@ export class TableComponent implements OnInit, TableActions{
       },
     ];
   }
+  width = [
+    {value:''},
+    {value:'No',wid : 0},
+    {value:'Yes (Default: 100)',wid : 100},
+  ];
+  alignment = [
+    {value:''},
+    {value:'Left'},
+    {value:'Right'},
+    {value:'Center'},
+  {value:'Justify'}
+];
   // while clicking options in context menu
   public contextMenuClick(args?): void {
-    console.log(args);
     if (args.item.id === 'addnext') {
       this.addnext(args);
     } else if (args.item.id === 'addchild') {
@@ -314,8 +327,8 @@ export class TableComponent implements OnInit, TableActions{
       this.setProperty('minWidth', args.item.wid);
       // this.treegrid.getColumnByField(this.activeContextMenuColumn.field).minWidth = args.item.wid;
       // this.treegrid.refreshColumns();
-    } else if (args.item.id === 'al-right' || args.item.id === 'al-left' || args.item.id === 'al-center' || args.item.id === 'al-justify') {
-      this.setProperty('textAlign', args.item.text);
+    // } else if (args.item.id === 'al-right' || args.item.id === 'al-left' || args.item.id === 'al-center' || args.item.id === 'al-justify') {
+    //   this.setProperty('textAlign', args.item.text);
       // this.treegrid.getColumnByField(this.activeContextMenuColumn.field).textAlign = args.item.text;
       // this.treegrid.refreshColumns();
     }else if (args.item.id === 'tw-clip' || args.item.id === 'tw-ellipsis-tooltip' || args.item.id === 'tw-ellipsis') {
@@ -440,7 +453,6 @@ export class TableComponent implements OnInit, TableActions{
   }
 
   public editColumn(){
-    console.log("hi");
     this.editcolumn = true;
     this.newcolumn = false;
     
@@ -466,7 +478,6 @@ export class TableComponent implements OnInit, TableActions{
   }
 
   public insertColumn(): void{
-    this.editcolumn = true;
     this.newcolumn = true; 
 
 
@@ -695,23 +706,36 @@ export class TableComponent implements OnInit, TableActions{
       }
     }
   }
-  public onEditformSubmit() {
-    const headertxt =  this.editForm.get('Columnname').value;
-    console.log(headertxt);
-      // tslint:disable-next-line: prefer-const
-    let c = <Column[]>
-        // tslint:disable-next-line: quotemark
-        // tslint:disable-next-line: max-line-length
-        [  { field: headertxt.replace(/\s/g, ''), headerText: headertxt, width: 130, format: 'yMd', textAlign: 'Right' ,allowReordering: true },
-        ];
-      // tslint:disable-next-line: align
-      // tslint:disable-next-line: prefer-for-of
-    for ( let i = 0; i < c.length; i++ ) {
-        (this.treegrid.columns as Column[]).push(c[i]);
-        this.treegrid.refreshColumns();
-      }
+  public onEditformSubmit() {    
+    if(this.editForm.get('Alignment').value.value){
+    this.setProperty('textAlign',this.editForm.get('Alignment').value.value );
+    }
+    if(this.editForm.get('ColumnWidth').value.value){
+      this.setProperty('minWidth',this.editForm.get('ColumnWidth').value.wid);
+    }
     this.editcolumn = false;
   }
+
+  public onSubmit(){    
+      const headertxt =  this.columnForm.get('Columnname').value;
+        // tslint:disable-next-line: prefer-const
+      let c = <Column[]>
+          // tslint:disable-next-line: quotemark
+          // tslint:disable-next-line: max-line-length
+          [  { field: headertxt.replace(/\s/g, ''), headerText: headertxt, width: 130, format: 'yMd', textAlign: 'Right' ,allowReordering: true },
+          ];
+        // tslint:disable-next-line: align
+        // tslint:disable-next-line: prefer-for-of
+      for ( let i = 0; i < c.length; i++ ) {
+          (this.treegrid.columns as Column[]).push(c[i]);
+          this.treegrid.refreshColumns(); 
+      }
+     this.newcolumn = false;
+  }
+  public closecolumn(){
+    this.newcolumn = false;
+  }
+
   public onFormSubmit(): void{
     this.formTask.taskName = this.taskForm.get('taskName').value;
     this.formTask.resourceCount = this.taskForm.get('resourceCount').value;
@@ -723,9 +747,7 @@ export class TableComponent implements OnInit, TableActions{
     this.taskService.updateTask(this.editKey, this.formTask);
     this.isEditing = false;
   }
-  public oneditFormSubmit() {
 
-  }
 
   // on Hierachy mode changes
   public onChange(e: ChangeEventArgs): any {

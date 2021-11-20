@@ -69,7 +69,7 @@
                 </div>
                 <div class="popup-actions">
                     <div>
-                        <button class="submit-button" (click)="oneditFormSubmit()">
+                        <button class="submit-button" (click)="onFormSubmit()">
                         Update Record
                     </button>
                     </div>
@@ -86,10 +86,6 @@
                     <i (click)="closepopup()" class="material-icons">close</i>
                 </div>
                 <div class="popup-content" [formGroup]="editForm">
-                    <div *ngIf='newcolumn' class="form-item">
-                        <label>Column name</label>
-                        <input formControlName="Columnname" type="text" />
-                    </div>
                     <div class="form-item">
                         <label>Data type</label>
                         <select formControlName="datatype">
@@ -119,11 +115,9 @@
                     <div class="form-item">
                         <label>Minimum-Column-Width</label>
                         <select formControlName='ColumnWidth'>
-                        <option [ngValue]="null" name="select">
-                            Select
-                        </option>
-                        <option [ngValue]='No' name="Text">No</option>
-                        <option [ngValue]='Yes' name="Num">Yes(Default-100)</option>
+                            <option *ngFor="let align of width" [ngValue]="align">
+                                {{ align.value }}
+                              </option>
                         </select>
                     </div>
                     <div class="form-item">
@@ -135,8 +129,8 @@
                             <option [ngValue]="10" name="10px">
                                 10px
                             </option>
-                            <option [ngValue]='13' name="13px">13px</option>
-                            <option [ngValue]='20' name="20px">20px</option>
+                            <option [ngValue]="13" name="13px">13px</option>
+                            <option [ngValue]="20" name="20px">20px</option>
                             </select>
                     </div>
                     <div class="form-item">
@@ -145,10 +139,11 @@
                             <option [ngValue]="null" name="select">
                                 Select
                             </option>
-                            <option [ngValue]="black" name="black">
-                                Black
+                            <option [ngValue]="10" name="10px">
+                             white
                             </option>
-                            <option [ngValue]='white' name="13px">white</option>
+                            <option [ngValue]="13" name="13px">black</option>
+                            <option [ngValue]="20" name="20px">20px</option>
                             
                             </select>
                     </div>
@@ -165,13 +160,9 @@
                     <div class="form-item">
                         <label>Alignment</label>
                         <select formControlName='Alignment'>
-                        <option [ngValue]="null" name="select">
-                            Select
-                        </option>
-                        <option [ngValue]='right' name="true">right</option>
-                        <option [ngValue]='left' name="false">left</option>
-                        <option [ngValue]='center' name="true">center</option>
-                        <option [ngValue]='justify' name="false">justify</option>
+                            <option *ngFor="let align of alignment" [ngValue]="align">
+                                {{ align.value }}
+                              </option>
                     </select>
                     </div>
                     <div class="form-item">
@@ -198,6 +189,28 @@
             </div>
 
         </div>
+        <div *ngIf='newcolumn' class="popup-background">
+            <div class="popup-box">
+                <div class="popup-head">
+                    <p>Column</p>
+                    <br />
+                    <i (click)="closecolumn()" class="material-icons">close</i>
+                </div>
+                <div class="popup-content" [formGroup]="columnForm">
+                    <div *ngIf='newcolumn' class="form-item">
+                        <label>Column name</label>
+                        <input required formControlName="Columnname" type="text" />
+                    </div>
+                </div>
+                <div class="popup-actions">
+                    <div>
+                        <button class="submit-button" (click)="onSubmit()">
+                        Update Column
+                    </button>
+                    </div>
 
+                </div>
+            </div>
+        </div>
     </div>
 </div>
