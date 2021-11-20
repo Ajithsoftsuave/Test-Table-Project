@@ -12,7 +12,7 @@ import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { TableActions, Task } from './tasks.model';
 import { TaskService } from './task.service';
 import { v4 as uuidv4 } from 'uuid';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup,FormControl,Validators  } from '@angular/forms';
 
 
 @Component({
@@ -69,9 +69,23 @@ export class TableComponent implements OnInit, TableActions{
   treegridColumns: Array<any> = new Array();
   taskForm: FormGroup;
   isEditing = false;
+  editcolumn = false;
   isCut = false;
   parentTasks: Task[];
   multipleSelectId: any[] = [];
+  newcolumn: boolean;
+  editForm = new FormGroup({
+    Columnname: new FormControl('', [Validators.required]),
+    datatype: new FormControl(''),
+    Defaultvalue: new FormControl(''),
+    ColumnWidth: new FormControl(''),
+      fontsize: new FormControl(''),
+      Fontcolor: new FormControl(''),
+      Backgroundcolor: new FormControl(''),
+      Alignment: new FormControl(''),
+      textwrap: new FormControl(''),
+    
+  })
 
   public constructor(
     private fb: FormBuilder,
@@ -96,20 +110,20 @@ export class TableComponent implements OnInit, TableActions{
       { text: 'Paste Next', target: '.e-content', id: 'pastenext', enabled : true },
       { text: 'Paste Child', target: '.e-content', id: 'pastechild', enabled : true },
       {
-        text: 'Style',
+        text: 'Edit col',
         target: '.e-headercell',
-        id: 'paste',
-        items: [
-          { text: 'Data-Type', id: 'datatype', items: [ { text: 'Text', id: 'dt-text'} , { text: 'Num', id: 'dt-num'} , { text: 'Date', id: 'dt-date'} , { text: 'Boolean', id: 'dt-bool'}, { text: 'Drop Down', id: 'dt-dropdown'}] },
-          { text: 'Default-Value', id: 'defaultvalue' , items: [ { text: 'Text', id: 'dt-text'} , { text: 'Num', id: 'dt-num'} , { text: 'Date', id: 'dt-date'} , { text: 'Boolean', id: 'dt-bool'}, { text: 'Drop Down', id: 'dt-dropdown'}] },
-          // tslint:disable-next-line:max-line-length
-          { text: 'Minimum-Column-Width', id: 'minwidth' , items: [ { text: 'No', id: 'min-width-no' , wid: 0}, { text: 'Yes (Default: 100)', id: 'min-width-yes' , wid: 100} ] },
-          { text: 'Font-size', id: 'fontsize' , items: [ { text: '10px', id: 'fs-10' }, { text: '13px', id: 'fs-13' }, { text: '20px', id: 'fs-20' }] },
-          { text: 'Font-color', id: 'fontcolor', items: [ { text: 'white', id: 'cl-white' }, { text: 'black', id: 'cl-black' }]},
-          { text: 'Background-color', id: 'bgcolr' , items: [ { text: 'red', id: 'bg-red' }, { text: 'blue', id: 'bg-blue' }, { text: 'white', id: 'bg-white' }] },
-          { text: 'Alignment', id: 'alignment' , items: [ { text: 'Right', id: 'al-right' }, { text: 'Left', id: 'al-left' }, { text: 'Center', id: 'al-center' }, { text: 'Justify', id: 'al-justify' }] },
-          { text: 'Text-wrap', id: 'textwrap' , items: [ { text: 'Clip', id: 'tw-clip' }, { text: 'EllipsisWithTooltip', id: 'tw-ellipsis-tooltip' }, { text: 'Ellipsis', id: 'tw-ellipsis' }] },
-        ],
+        id: 'editcol',
+        // items: [
+        //   { text: 'Data-Type', id: 'datatype', items: [ { text: 'Text', id: 'dt-text'} , { text: 'Num', id: 'dt-num'} , { text: 'Date', id: 'dt-date'} , { text: 'Boolean', id: 'dt-bool'}, { text: 'Drop Down', id: 'dt-dropdown'}] },
+        //   { text: 'Default-Value', id: 'defaultvalue' , items: [ { text: 'Text', id: 'dt-text'} , { text: 'Num', id: 'dt-num'} , { text: 'Date', id: 'dt-date'} , { text: 'Boolean', id: 'dt-bool'}, { text: 'Drop Down', id: 'dt-dropdown'}] },
+        //   // tslint:disable-next-line:max-line-length
+        //   { text: 'Minimum-Column-Width', id: 'minwidth' , items: [ { text: 'No', id: 'min-width-no' , wid: 0}, { text: 'Yes (Default: 100)', id: 'min-width-yes' , wid: 100} ] },
+        //   { text: 'Font-size', id: 'fontsize' , items: [ { text: '10px', id: 'fs-10' }, { text: '13px', id: 'fs-13' }, { text: '20px', id: 'fs-20' }] },
+        //   { text: 'Font-color', id: 'fontcolor', items: [ { text: 'white', id: 'cl-white' }, { text: 'black', id: 'cl-black' }]},
+        //   { text: 'Background-color', id: 'bgcolr' , items: [ { text: 'red', id: 'bg-red' }, { text: 'blue', id: 'bg-blue' }, { text: 'white', id: 'bg-white' }] },
+        //   { text: 'Alignment', id: 'alignment' , items: [ { text: 'Right', id: 'al-right' }, { text: 'Left', id: 'al-left' }, { text: 'Center', id: 'al-center' }, { text: 'Justify', id: 'al-justify' }] },
+        //   { text: 'Text-wrap', id: 'textwrap' , items: [ { text: 'Clip', id: 'tw-clip' }, { text: 'EllipsisWithTooltip', id: 'tw-ellipsis-tooltip' }, { text: 'Ellipsis', id: 'tw-ellipsis' }] },
+        // ],
       },
       { text: 'Freeze', target: '.e-headercell', id: 'freeze' },
       { text: 'Multisort', target: '.e-headercell', id: 'paste' },
@@ -269,6 +283,7 @@ export class TableComponent implements OnInit, TableActions{
   }
   // while clicking options in context menu
   public contextMenuClick(args?): void {
+    console.log(args);
     if (args.item.id === 'addnext') {
       this.addnext(args);
     } else if (args.item.id === 'addchild') {
@@ -285,6 +300,8 @@ export class TableComponent implements OnInit, TableActions{
       this.pasteChildRecords(this.copiedTasks, args.rowInfo.rowData.taskData.id, args.rowInfo.rowData.taskData.key);
     } else if (args.item.id === 'edit' && args.item.target === '.e-content') {
       this.editRow(args.rowInfo.rowData.taskData, args.rowInfo.rowData.taskData.key);
+    }else if (args.item.id === 'editcol') {
+      this.editColumn();
     }else if (args.item.id === 'freeze') {
       this.freezeColumn();
     }else if (args.item.id === 'insert') {
@@ -422,6 +439,13 @@ export class TableComponent implements OnInit, TableActions{
       }
   }
 
+  public editColumn(){
+    console.log("hi");
+    this.editcolumn = true;
+    this.newcolumn = false;
+    
+  }
+
   public freezeColumn(): void {
     const treegridtreegridcomp = window.localStorage.getItem('treegridtreegridcomp');
     const treegridtreegridcompJSON = JSON.parse(treegridtreegridcomp);
@@ -437,20 +461,16 @@ export class TableComponent implements OnInit, TableActions{
     }
   }
 
+  public closepopup(){
+    this.editcolumn = false;
+  }
+
   public insertColumn(): void{
-    const headertxt =  prompt('enter column header name');
-      // tslint:disable-next-line: prefer-const
-    let c = <Column[]>
-        // tslint:disable-next-line: quotemark
-        // tslint:disable-next-line: max-line-length
-        [  { field: headertxt.replace(/\s/g, ''), headerText: headertxt, width: 130, format: 'yMd', textAlign: 'Right' ,allowReordering: true },
-        ];
-      // tslint:disable-next-line: align
-      // tslint:disable-next-line: prefer-for-of
-    for ( let i = 0; i < c.length; i++ ) {
-        (this.treegrid.columns as Column[]).push(c[i]);
-        this.treegrid.refreshColumns();
-      }
+    this.editcolumn = true;
+    this.newcolumn = true; 
+
+
+    
   }
 
   public deleteColumn(): void {
@@ -675,7 +695,23 @@ export class TableComponent implements OnInit, TableActions{
       }
     }
   }
-
+  public onEditformSubmit() {
+    const headertxt =  this.editForm.get('Columnname').value;
+    console.log(headertxt);
+      // tslint:disable-next-line: prefer-const
+    let c = <Column[]>
+        // tslint:disable-next-line: quotemark
+        // tslint:disable-next-line: max-line-length
+        [  { field: headertxt.replace(/\s/g, ''), headerText: headertxt, width: 130, format: 'yMd', textAlign: 'Right' ,allowReordering: true },
+        ];
+      // tslint:disable-next-line: align
+      // tslint:disable-next-line: prefer-for-of
+    for ( let i = 0; i < c.length; i++ ) {
+        (this.treegrid.columns as Column[]).push(c[i]);
+        this.treegrid.refreshColumns();
+      }
+    this.editcolumn = false;
+  }
   public onFormSubmit(): void{
     this.formTask.taskName = this.taskForm.get('taskName').value;
     this.formTask.resourceCount = this.taskForm.get('resourceCount').value;
@@ -686,6 +722,9 @@ export class TableComponent implements OnInit, TableActions{
 
     this.taskService.updateTask(this.editKey, this.formTask);
     this.isEditing = false;
+  }
+  public oneditFormSubmit() {
+
   }
 
   // on Hierachy mode changes

@@ -1,101 +1,203 @@
 <div class="page">
-<div class="header">
-    <h4 class="title" > Project Tasks List</h4>
-</div>
-<div class="main_continer">
-    <div class="head">
-    <span><button class="btn" (click)='addTask()'>Add Record</button> </span>
+    <div class="header">
+        <h4 class="title"> Project Tasks List</h4>
     </div>
+    <div class="main_continer">
+        <div class="head">
+            <span><button class="btn" (click)='addTask()'>Add Record</button> </span>
+        </div>
 
 
-    <div class="control-section" *ngIf='tableData !== [] && tableData[0]'>
+        <div class="control-section" *ngIf='tableData !== [] && tableData[0]'>
 
-      <ejs-treegrid class="treegrid" #treegrid [dataSource]='tableData' [enablePersistence]='true' allowReordering="true" [enableHover]='false' childMapping='subtasks' [treeColumnIndex]='1' id="treegridcomp" [pageSettings]='pageSettings' allowFiltering='true' allowExcelExport='true' allowPdfExport='true' allowSorting='true' [allowResizing]=true
-                    [allowSelection]='true' [selectionSettings]='selectionOptions'
-                  [frozenColumns]="freezeIndex" [(contextMenuItems)]="contextMenuItems" [editSettings]='editing' [toolbar]="toolbar"
-                    (rowDeselected)="getCheckboxData($event, 'deselect')" (rowSelected)="getCheckboxData($event, 'select')"      (contextMenuOpen)="openContextMenu($event)" (contextMenuClick)='contextMenuClick($event)' [showColumnChooser]="true">
-            <e-columns>
-                <e-column [customAttributes]="{ class: []}" field="" type='checkbox' width='30' [showInColumnChooser]="true"></e-column>
-                <e-column [customAttributes]="{ class: []}" field='id' headerText='ID' isPrimaryKey='true' width='40' [edit]='editparams' textAlign='Right' editType='numericedit'></e-column>
-                <e-column [customAttributes]="{ class: []}" field='taskName' headerText='Task Name' width='30'></e-column>
-                <e-column [customAttributes]="{ class: []}" field='resourceCount' headerText='Resource Count' width='30'></e-column>
-                <e-column [customAttributes]="{ class: []}" field='team' headerText='Team' width='30'></e-column>
-                <e-column [customAttributes]="{ class: []}" field='duration' headerText='Duration' width='35'  [edit]='editparams' textAlign='Right' editType='numericedit'></e-column>
-                <e-column [customAttributes]="{ class: []}" field='progress' headerText='Progress' width='30' textAlign='Right'  [edit]='editparams' editType='numericedit'></e-column>
-                <e-column [customAttributes]="{ class: []}" field='priority' headerText='Priority' width='30' textAlign='Right'   editType='stringedit'></e-column>
-                <e-column [customAttributes]="{ class: []}" field='approved' headerText='Approved' width='30' textAlign='Right'   editType='stringedit'></e-column>
-            </e-columns>
+            <ejs-treegrid class="treegrid" #treegrid [dataSource]='tableData' [enablePersistence]='true' allowReordering="true" [enableHover]='false' childMapping='subtasks' [treeColumnIndex]='1' id="treegridcomp" [pageSettings]='pageSettings' allowFiltering='true'
+                allowExcelExport='true' allowPdfExport='true' allowSorting='true' [allowResizing]=true [allowSelection]='true' [selectionSettings]='selectionOptions' [frozenColumns]="freezeIndex" [(contextMenuItems)]="contextMenuItems" [editSettings]='editing'
+                [toolbar]="toolbar" (rowDeselected)="getCheckboxData($event, 'deselect')" (rowSelected)="getCheckboxData($event, 'select')" (contextMenuOpen)="openContextMenu($event)" (contextMenuClick)='contextMenuClick($event)' [showColumnChooser]="true">
+                <e-columns>
+                    <e-column [customAttributes]="{ class: []}" field="" type='checkbox' width='30' [showInColumnChooser]="true"></e-column>
+                    <e-column [customAttributes]="{ class: []}" field='id' headerText='ID' isPrimaryKey='true' width='40' [edit]='editparams' textAlign='Right' editType='numericedit'></e-column>
+                    <e-column [customAttributes]="{ class: []}" field='taskName' headerText='Task Name' width='30'></e-column>
+                    <e-column [customAttributes]="{ class: []}" field='resourceCount' headerText='Resource Count' width='30'></e-column>
+                    <e-column [customAttributes]="{ class: []}" field='team' headerText='Team' width='30'></e-column>
+                    <e-column [customAttributes]="{ class: []}" field='duration' headerText='Duration' width='35' [edit]='editparams' textAlign='Right' editType='numericedit'></e-column>
+                    <e-column [customAttributes]="{ class: []}" field='progress' headerText='Progress' width='30' textAlign='Right' [edit]='editparams' editType='numericedit'></e-column>
+                    <e-column [customAttributes]="{ class: []}" field='priority' headerText='Priority' width='30' textAlign='Right' editType='stringedit'></e-column>
+                    <e-column [customAttributes]="{ class: []}" field='approved' headerText='Approved' width='30' textAlign='Right' editType='stringedit'></e-column>
+                </e-columns>
 
-        </ejs-treegrid>
-    </div>
+            </ejs-treegrid>
+        </div>
 
-    <div *ngIf = 'isEditing' class="popup-background">
-        <div class="popup-box">
-            <div class="popup-head">
-                <p>Update Record for: {{ this.formTask.id }}</p>
-                <br />
-                <i (click)="isEditing = false" class="material-icons">close</i>
-            </div>
-            <div class="popup-content" [formGroup]="taskForm">
-                <div class="form-item">
-                    <label>Task Name:</label>
-                    <input
-                        formControlName="taskName"
-                        type="text"
-                    />
+        <div *ngIf='isEditing' class="popup-background">
+            <div class="popup-box">
+                <div class="popup-head">
+                    <p>Update Record for: {{ this.formTask.id }}</p>
+                    <br />
+                    <i (click)="isEditing = false" class="material-icons">close</i>
                 </div>
-                <div class="form-item">
-                    <label>Resource Count</label>
-                    <input
-                        formControlName="resourceCount"
-                        type="number"
-                    />
-                </div>
-                <div class="form-item">
-                    <label>Progress</label>
-                    <input
-                        formControlName="progress"
-                        type="number"
-                    />
-                </div>
-                <div class="form-item">
-                    <label>Duration</label>
-                    <input
-                        formControlName="duration"
-                        type="number"
-                    />
-                </div>
-                <div class="form-item">
-                    <label>Priority</label>
-                    <input
-                        formControlName="priority"
-                        type="text"
-                    />
-                </div>
-                <div class="form-item">
-                    <label>Approved</label>
-                    <select formControlName="approved">
+                <div class="popup-content" [formGroup]="taskForm">
+                    <div class="form-item">
+                        <label>Task Name:</label>
+                        <input formControlName="taskName" type="text" />
+                    </div>
+                    <div class="form-item">
+                        <label>Resource Count</label>
+                        <input formControlName="resourceCount" type="number" />
+                    </div>
+                    <div class="form-item">
+                        <label>Progress</label>
+                        <input formControlName="progress" type="number" />
+                    </div>
+                    <div class="form-item">
+                        <label>Duration</label>
+                        <input formControlName="duration" type="number" />
+                    </div>
+                    <div class="form-item">
+                        <label>Priority</label>
+                        <input formControlName="priority" type="text" />
+                    </div>
+                    <div class="form-item">
+                        <label>Approved</label>
+                        <select formControlName="approved">
                         <option [ngValue]="null" name="select">
                             Select
                         </option>
                         <option [ngValue]=true name="true">True</option>
                         <option [ngValue]=false name="false">False</option>
                     </select>
+                    </div>
                 </div>
-            </div>
-            <div class="popup-actions">
-                <div>
-                    <button class="submit-button" (click)="onFormSubmit()">
+                <div class="popup-actions">
+                    <div>
+                        <button class="submit-button" (click)="oneditFormSubmit()">
                         Update Record
                     </button>
-                </div>
+                    </div>
 
+                </div>
             </div>
+
+        </div>
+        <div *ngIf='editcolumn' class="popup-background">
+            <div class="popup-box">
+                <div class="popup-head">
+                    <p>Column</p>
+                    <br />
+                    <i (click)="closepopup()" class="material-icons">close</i>
+                </div>
+                <div class="popup-content" [formGroup]="editForm">
+                    <div *ngIf='newcolumn' class="form-item">
+                        <label>Column name</label>
+                        <input formControlName="Columnname" type="text" />
+                    </div>
+                    <div class="form-item">
+                        <label>Data type</label>
+                        <select formControlName="datatype">
+                        <option [ngValue]="null" name="select">
+                            Select
+                        </option>
+                        <option [ngValue]='Text' name="Text">Text</option>
+                        <option [ngValue]='Num' name="Num">Num</option>
+                        <option [ngValue]='Date' name="Date">Date</option>
+                        <option [ngValue]='Boolean' name="Boolean">Boolean</option>
+                         <option [ngValue]='Dropdown' name="Dropdown">Drop down</option> 
+                        </select>
+                    </div>
+                    <div class="form-item">
+                        <label>Default-value</label>
+                        <select formControlName='Defaultvalue'>
+                        <option [ngValue]="all" name="select">
+                            All
+                        </option>
+                        <option [ngValue]='Text' name="Text">Text</option>
+                        <option [ngValue]='Num' name="Num">Num</option>
+                        <option [ngValue]='Date' name="Date">Date</option>
+                        <option [ngValue]='Boolean' name="Boolean">Boolean</option>
+                        <option [ngValue]='Dropdown' name="Dropdown">Drop down</option>
+                         </select>
+                    </div>
+                    <div class="form-item">
+                        <label>Minimum-Column-Width</label>
+                        <select formControlName='ColumnWidth'>
+                        <option [ngValue]="null" name="select">
+                            Select
+                        </option>
+                        <option [ngValue]='No' name="Text">No</option>
+                        <option [ngValue]='Yes' name="Num">Yes(Default-100)</option>
+                        </select>
+                    </div>
+                    <div class="form-item">
+                        <label>Font-size</label>
+                        <select formControlName='fontsize'>
+                            <option [ngValue]="null" name="select">
+                                Select
+                            </option>
+                            <option [ngValue]="10" name="10px">
+                                10px
+                            </option>
+                            <option [ngValue]='13' name="13px">13px</option>
+                            <option [ngValue]='20' name="20px">20px</option>
+                            </select>
+                    </div>
+                    <div class="form-item">
+                        <label>Font-color</label>
+                        <select formControlName='Fontcolor'>
+                            <option [ngValue]="null" name="select">
+                                Select
+                            </option>
+                            <option [ngValue]="black" name="black">
+                                Black
+                            </option>
+                            <option [ngValue]='white' name="13px">white</option>
+                            
+                            </select>
+                    </div>
+                    <div class="form-item">
+                        <label>Background-color</label>
+                        <select formControlName='Backgroundcolor'>
+                        <option [ngValue]="null" name="select">
+                            Select
+                        </option>
+                        <option [ngValue]='red' name="true">Red</option>
+                        <option [ngValue]='Blue' name="false">White</option>
+                    </select>
+                    </div>
+                    <div class="form-item">
+                        <label>Alignment</label>
+                        <select formControlName='Alignment'>
+                        <option [ngValue]="null" name="select">
+                            Select
+                        </option>
+                        <option [ngValue]='right' name="true">right</option>
+                        <option [ngValue]='left' name="false">left</option>
+                        <option [ngValue]='center' name="true">center</option>
+                        <option [ngValue]='justify' name="false">justify</option>
+                    </select>
+                    </div>
+                    <div class="form-item">
+                        <label>Text wrap</label>
+                        <select formControlName='textwrap'>
+                        <option [ngValue]="null" name="select">
+                            Select
+                        </option>
+                        <option [ngValue]='clip' name="true">clip</option>
+                        <option [ngValue]='EllipsisWithTooltip' name="false">EllipsisWithTooltip</option>
+                        <option [ngValue]='Ellipsis' name="true">Ellipsis</option>
+                        
+                    </select>
+                    </div>
+                </div>
+                <div class="popup-actions">
+                    <div>
+                        <button class="submit-button" (click)="onEditformSubmit()">
+                        Update Column
+                    </button>
+                    </div>
+
+                </div>
+            </div>
+
         </div>
 
     </div>
-
 </div>
-</div>
-
-
